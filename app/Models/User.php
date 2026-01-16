@@ -16,13 +16,12 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
-        'phone',      // Tambahan untuk No HP
-        'role',       // Tambahan untuk role (admin/user)
-        'avatar',     // Tambahan untuk foto profil (opsional)
-        'username',   // Tambahan username (opsional)
-    ];
+        'phone',
+        'role',
+    ]; 
 
     /**
      * Kolom yang disembunyikan saat data user diambil (Security)

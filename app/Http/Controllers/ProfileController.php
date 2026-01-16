@@ -28,7 +28,7 @@ class ProfileController extends Controller
             ->latest()
             ->get();
 
-        return view('pages.profile.index', compact('tickets', 'orders'));
+        return view('customer.pages.profile.index', compact('tickets', 'orders'));
     }
     public function update(Request $request)
     {

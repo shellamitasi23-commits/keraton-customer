@@ -13,7 +13,7 @@ class TicketController extends Controller
     public function index()
     {
         $tickets = TicketCategory::all();
-        return view('pages.tiket.index', compact('tickets'));
+        return view('customer.pages.tiket.index', compact('tickets'));
     }
 
     // 1. Simpan Order Sementara & Arahkan ke Pembayaran
@@ -31,7 +31,7 @@ class TicketController extends Controller
         // Hitung total manual agar aman dari manipulasi frontend
         foreach ($request->tickets as $id => $qty) {
             if ($qty > 0) {
-                $ticket = TicketCategory::find($id);
+                $ticket = TicketCategory::findOrFail($id);
                 $totalPrice += $ticket->price * $qty;
                 $totalTicket += $qty;
                 $categoryId = $id; // Ambil salah satu kategori untuk simplifikasi relasi
@@ -61,7 +61,7 @@ class TicketController extends Controller
     public function payment($id)
     {
         $transaction = TicketTransaction::where('user_id', Auth::id())->findOrFail($id);
-        return view('pages.tiket.payment', compact('transaction'));
+        return view('customer.pages.tiket.payment', compact('transaction'));
     }
 
     // 3. Proses Bayar (Simulasi) -> Redirect ke Profile & Buka Invoice

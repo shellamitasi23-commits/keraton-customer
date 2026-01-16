@@ -27,6 +27,6 @@ class HomeController extends Controller
             ],
         ];
 
-        return view('pages.home', compact('areas'));
+        return view('customer.pages.home', compact('areas'));
     }
 }

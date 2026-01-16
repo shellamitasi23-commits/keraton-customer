@@ -18,7 +18,7 @@ class ShopController extends Controller
     public function index()
     {
         $products = Product::all();
-        return view('pages.shop.index', compact('products'));
+        return view('customer.pages.shop.index', compact('products'));
     }
 
     // Menambah barang ke keranjang
@@ -54,9 +54,29 @@ class ShopController extends Controller
             return $item->product->price * $item->quantity;
         });
 
-        return view('pages.shop.cart', compact('carts', 'subtotal'));
+        return view('customer.pages.shop.cart', compact('carts', 'subtotal'));
     }
+    // Tambahkan method ini di dalam ShopController
 
+    // Update quantity (increase/decrease)
+    public function updateCart(Request $request, $id)
+    {
+        $cart = Cart::where('user_id', Auth::id())->findOrFail($id);
+
+        if ($request->action === 'increase') {
+            $cart->increment('quantity');
+        } elseif ($request->action === 'decrease') {
+            if ($cart->quantity > 1) {
+                $cart->decrement('quantity');
+            } else {
+                // Jika quantity = 1 dan dikurangi, hapus item
+                $cart->delete();
+                return back()->with('success', 'Item dihapus dari keranjang.');
+            }
+        }
+
+        return back()->with('success', 'Keranjang diperbarui.');
+    }
     // Menghapus item dari keranjang
     public function deleteCart($id)
     {
@@ -81,7 +101,7 @@ class ShopController extends Controller
         $service = 5000;   // Biaya Layanan
         $grandTotal = $subtotal + $shipping + $service;
 
-        return view('pages.shop.checkout', compact('carts', 'subtotal', 'shipping', 'service', 'grandTotal'));
+        return view('customer.pages.shop.checkout', compact('carts', 'subtotal', 'shipping', 'service', 'grandTotal'));
     }
 
     // Proses Simpan Order (Pindah dari Cart ke Order)
@@ -133,7 +153,7 @@ class ShopController extends Controller
     public function payment($id)
     {
         $order = Order::where('user_id', Auth::id())->findOrFail($id);
-        return view('pages.shop.payment', compact('order'));
+        return view('customer.pages.shop.payment', compact('order'));
     }
 
     // Proses Bayar Akhir
