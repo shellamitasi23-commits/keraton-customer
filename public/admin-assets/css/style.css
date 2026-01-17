@@ -21133,3 +21133,134 @@ div.tagsinput {
   flex-grow: 1; }
 
 /*# sourceMappingURL=maps/style.css.map */
+/* ================================= ADMIN DARK CUSTOM STYLES ================================= */
+
+:root {
+  --bg-main: #121917;
+  --bg-surface: #1B2421;
+  --primary: #3FAE9A;
+  --primary-hover: #369786;
+  --primary-soft: rgba(63,174,154,0.15);
+  --text-main: #E6F1EE;
+  --text-muted: #9FB6B1;
+  --border-color: #263330;
+  --danger: #E57373;
+}
+
+/* ====== Base ====== */
+body {
+  background: var(--bg-main);
+  color: var(--text-main);
+}
+
+/* ====== Card ====== */
+.card {
+  background: var(--bg-surface);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.35);
+  margin-bottom: 24px;
+}
+
+.card-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+/* ====== Form ====== */
+.form-group label {
+  color: var(--text-muted);
+  font-size: 13px;
+  margin-bottom: 8px;
+}
+
+.form-control {
+  background: #141E1B;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-main);
+}
+
+.form-control::placeholder {
+  color: #6F8B85;
+}
+
+.form-control:focus {
+  background: #141E1B;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px var(--primary-soft);
+  color: var(--text-main);
+}
+
+/* ====== Button ====== */
+.btn {
+  border-radius: 8px;
+  padding: 8px 20px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #0E1513;
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+  border-color: var(--primary-hover);
+}
+
+/* ====== Table ====== */
+.table {
+  color: var(--text-main);
+}
+
+.table thead th {
+  background: #16211E;
+  color: var(--text-muted);
+  font-size: 12px;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table tbody td {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.table-hover tbody tr:hover {
+  background: var(--table-hover);
+}
+
+/* ====== Thumbnail ====== */
+.museum-thumbnail {
+  border-radius: 10px;
+  border: 2px solid var(--border-color);
+}
+
+/* ====== Alert ====== */
+.alert-success {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.alert-danger {
+  background: rgba(229,115,115,0.15);
+  color: var(--danger);
+}
+
+/* ====== Modal ====== */
+.modal-content {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+}
+
+.modal-title {
+  color: var(--text-main);
+}
+
+/* ====== Utilities ====== */
+.text-muted {
+  color: var(--text-muted) !important;
+}

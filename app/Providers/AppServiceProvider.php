@@ -9,21 +9,21 @@ use App\Models\Cart;
 
 class AppServiceProvider extends ServiceProvider
 {
-    public function boot()
+    public function boot(): void
     {
-        // Share $cartCount ke semua view yang pakai layout master
-        View::composer('layouts.master', function ($view) {
-            $cartCount = 0;
-
+        // Share cart count ke semua view
+        View::composer('* ', function ($view) {
             if (Auth::check()) {
                 $cartCount = Cart::where('user_id', Auth::id())->sum('quantity');
+            } else {
+                $cartCount = 0;
             }
 
             $view->with('cartCount', $cartCount);
         });
     }
 
-    public function register()
+    public function register(): void
     {
         //
     }

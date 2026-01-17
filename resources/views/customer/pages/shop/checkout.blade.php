@@ -30,11 +30,11 @@
             </div>
             <div class="flex justify-between mb-2 text-sm text-gray-600">
                 <span>Ongkir (Flat)</span>
-                <span>Rp {{ number_format($shipping, 0, ',', '.') }}</span>
+                <span>Rp{{ number_format($shippingPrice, 0, ',', '.') }}</span>
             </div>
             <div class="flex justify-between mb-4 text-sm text-gray-600">
                 <span>Biaya Layanan</span>
-                <span>Rp {{ number_format($service, 0, ',', '.') }}</span>
+                <span>Rp {{ number_format(0, 0, ',', '.') }}</span>
             </div>
             
             <div class="border-t border-dashed border-gray-300 pt-4 flex justify-between font-bold text-lg mb-6 text-[#103120]">

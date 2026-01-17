@@ -44,29 +44,35 @@
                         <span class="font-bold text-lg text-[#103120]">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                     </div>
 
-                    @auth
-                        <div class="grid grid-cols-4 gap-2">
-                            <form action="{{ route('shop.add', $product->id) }}" method="POST" class="col-span-1">
-                                @csrf
-                                <button type="submit" class="w-full h-10 border border-gray-300 rounded-lg flex items-center justify-center hover:bg-gray-50 hover:border-[#103120] hover:text-[#103120] transition text-gray-400" title="Tambah ke Keranjang">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                </button>
-                            </form>
-                            
-                            <form action="{{ route('shop.add', $product->id) }}" method="POST" class="col-span-3">
-                                @csrf
-                                <button type="submit" class="w-full h-10 bg-[#103120] text-white rounded-lg font-bold text-sm hover:bg-green-900 transition shadow-md hover:shadow-lg">
-                                    Beli Sekarang
-                                </button>
-                            </form>
-                        </div>
-                    @else
-                        <button onclick="document.getElementById('loginModal').showModal()" class="w-full h-10 bg-gray-100 text-gray-500 rounded-lg font-bold text-sm hover:bg-gray-200 transition">
-                            Login untuk Membeli
-                        </button>
-                    @endauth
+                  @auth
+    {{-- Form Add to Cart untuk User yang Sudah Login --}}
+    <form action="{{ route('shop.add', $product->id) }}" method="POST">
+        @csrf
+        <div class="flex items-center gap-2 mb-3">
+            <label class="text-sm font-semibold">Jumlah:</label>
+            <input type="number" 
+                   name="quantity" 
+                   value="1" 
+                   min="1" 
+                   max="{{ $product->stock }}"
+                   class="w-20 px-3 py-2 border rounded-lg focus:ring-2 focus:ring-[#103120]"
+                   required>
+        </div>
+        
+        <button type="submit" 
+                class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+            <i class="mdi mdi-cart-plus mr-2"></i>
+            Tambah ke Keranjang
+        </button>
+    </form>
+@else
+    {{-- Tombol Login untuk Guest --}}
+    <button onclick="document.getElementById('loginModal').showModal()" 
+            class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+        <i class="mdi mdi-login mr-2"></i>
+        Login untuk Membeli
+    </button>
+@endauth
                 </div>
             </div>
         </div>

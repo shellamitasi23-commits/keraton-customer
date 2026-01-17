@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Import Semua Controller
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\MuseumController;
@@ -13,31 +12,42 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\MuseumManagementController;
 use App\Http\Controllers\Admin\TicketManagementController;
 use App\Http\Controllers\Admin\ShopManagementController;
+use App\Http\Controllers\Admin\DashboardController;
 
 /*
 |--------------------------------------------------------------------------
-| 1. PUBLIC ROUTES (Bisa diakses tanpa login)
+| 1. CUSTOMER HOME & AUTHENTICATION ROUTES (Akses Umum)
 |--------------------------------------------------------------------------
 */
 
-// Halaman Utama & Informasi
-Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+// Halaman Utama untuk Customer (Akses Umum)
+Route::get('/', [HomeController::class, 'index'])->name('customer.home');
 
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Rute Login Customer (Email)
+Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+
+// Rute Registrasi Customer
+Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form');
+Route::post('/register', [AuthController::class, 'register'])->name('register');
+
+// Rute Login Admin (Username)
+Route::get('/admin/login', [AuthController::class, 'showAdminLoginForm'])->name('admin.login');
+Route::post('/admin/login', [AuthController::class, 'adminLogin']);
+
+// Logout
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/admin/logout', [AuthController::class, 'adminLogout'])->name('admin.logout');
+
+// Halaman Informasi Publik
 Route::get('/museum', [MuseumController::class, 'index'])->name('museum');
 Route::get('/tiket', [TicketController::class, 'index'])->name('tiket.index');
 Route::get('/shop', [ShopController::class, 'index'])->name('shop.index');
 
-// Proses Autentikasi tetap menggunakan POST
-Route::post('/register', [AuthController::class, 'register'])->name('register');
-Route::post('/login', [AuthController::class, 'login']);
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
-
 /*
 |--------------------------------------------------------------------------
-| 2. PROTECTED ROUTES (Wajib Login)
+| 2. CUSTOMER PROTECTED ROUTES (Perlu Login)
 |--------------------------------------------------------------------------
-| Semua route di dalam group ini otomatis dicek apakah user sudah login.
 */
 
 Route::middleware(['auth'])->group(function () {
@@ -71,23 +81,29 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-/*
-|--------------------------------------------------------------------------
-| 3. ADMIN ROUTES (Hanya Role Admin)
-|--------------------------------------------------------------------------
-*/
-Route::middleware(['auth', \App\Http\Middleware\IsAdmin::class])->prefix('admin')->name('admin.')->group(function () {
+// Admin Routes
+Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
-    // Dashboard & Laporan
-    Route::get('/dashboard', [ReportController::class, 'index'])->name('dashboard');
-
-    // CRUD Resources
+    // Kelola Museum
     Route::get('/museum', [MuseumManagementController::class, 'index'])->name('museum.index');
     Route::post('/museum', [MuseumManagementController::class, 'store'])->name('museum.store');
-    Route::delete('/museum/{museum}', [MuseumManagementController::class, 'destroy'])->name('museum.destroy');
     Route::put('/museum/{museum}', [MuseumManagementController::class, 'update'])->name('museum.update');
-    
-    Route::resource('tickets', TicketManagementController::class);
+    Route::delete('/museum/{museum}', [MuseumManagementController::class, 'destroy'])->name('museum.destroy');
 
-    Route::resource('shop', ShopManagementController::class);
+    // Kelola Tiket
+    Route::get('/tickets', [TicketManagementController::class, 'index'])->name('tickets.index');
+    Route::post('/tickets', [TicketManagementController::class, 'store'])->name('tickets.store');
+    Route::put('/tickets/{id}', [TicketManagementController::class, 'update'])->name('tickets.update');
+    Route::delete('/tickets/{id}', [TicketManagementController::class, 'destroy'])->name('tickets.destroy');
+
+    // Kelola Shop - Full CRUD
+    Route::get('/shop', [ShopManagementController::class, 'index'])->name('shop.index');
+    Route::post('/shop', [ShopManagementController::class, 'store'])->name('shop.store');
+    Route::put('/shop/{id}', [ShopManagementController::class, 'update'])->name('shop.update');
+    Route::delete('/shop/{id}', [ShopManagementController::class, 'destroy'])->name('shop.destroy');
+
+    // Laporan
+    Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/reports/download', [ReportController::class, 'downloadPDF'])->name('reports.download');
 });

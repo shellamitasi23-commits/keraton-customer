@@ -1,11 +1,11 @@
 <nav class="bg-[#103120] text-white py-4 px-6 fixed w-full top-0 z-50 shadow-md">
     <div class="max-w-7xl mx-auto flex justify-between items-center">
-        <a href="{{ route('home') }}" class="flex items-center gap-3">
+        <a href="{{ route('customer.home') }}" class="flex items-center gap-3">
             <img src="{{ asset('images/logo.png') }}" alt="Logo" class="h-12 w-auto object-contain"> 
         </a>
 
         <div class="hidden md:flex gap-8 text-sm font-medium uppercase tracking-wide">
-            <a href="{{ route('home') }}" class="hover:text-yellow-400 transition {{ request()->routeIs('home') ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : '' }}">
+            <a href="{{ route('customer.home') }}" class="hover:text-yellow-400 transition {{ request()->routeIs('customer.home') ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : '' }}">
                 Home
             </a>
             <a href="{{ route('tiket.index') }}" class="hover:text-yellow-400 transition {{ request()->routeIs('tiket.*') ? 'text-yellow-400 border-b-2 border-yellow-400 pb-1' : '' }}">

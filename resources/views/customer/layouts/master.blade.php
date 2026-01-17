@@ -21,37 +21,60 @@
 
     @include('customer.partials.footer')
 
-    <dialog id="loginModal" class="bg-transparent p-0 rounded-xl shadow-2xl">
-        <div class="bg-white p-8 w-[400px] relative rounded-xl border border-gray-100">
-            <button onclick="document.getElementById('loginModal').close()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">✕</button>
-            
-            <h3 class="serif text-3xl font-bold text-center mb-6 text-[#103120]">LOGIN</h3>
+ @guest
+    {{-- Login Modal hanya untuk yang belum login --}}
+    <dialog id="loginModal" class="p-0 rounded-lg shadow-2xl backdrop:bg-black/60 w-[400px]">
+        <div class="bg-white p-8">
+            <h3 class="text-2xl font-bold text-center mb-6">LOGIN</h3>
             
             @if($errors->any())
-                <div class="bg-red-50 border border-red-200 text-red-600 p-3 rounded mb-4 text-sm text-center">
+                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
                     {{ $errors->first() }}
                 </div>
             @endif
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
+                
                 <div class="mb-4">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Email</label>
-                    <input type="email" name="email" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white transition" placeholder="Email Anda" required>
+                    <label class="block text-sm font-semibold mb-2">Email</label>
+                    <input type="email" 
+                           name="email" 
+                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#103120]"
+                           placeholder="Email Anda"
+                           required>
                 </div>
+
                 <div class="mb-6">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Password</label>
-                    <input type="password" name="password" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white transition" placeholder="Password Anda" required>
+                    <label class="block text-sm font-semibold mb-2">Password</label>
+                    <input type="password" 
+                           name="password" 
+                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#103120]"
+                           placeholder="Password Anda"
+                           required>
                 </div>
-                <button type="submit" class="w-full bg-[#103120] text-white py-3 rounded-lg font-bold hover:bg-green-900 transition shadow-lg transform hover:-translate-y-0.5">Login</button>
+
+                <button type="submit" 
+                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+                    Login
+                </button>
             </form>
 
-            <div class="mt-6 text-center text-sm">
-                <span class="text-gray-500">Belum punya akun?</span>
-                <button onclick="document.getElementById('loginModal').close(); document.getElementById('registerModal').showModal()" class="text-[#103120] font-bold underline ml-1">Daftar Sekarang</button>
-            </div>
+            <p class="text-center mt-4 text-sm text-gray-600">
+                Belum punya akun? 
+                <a href="{{ route('register.form') }}" class="font-semibold text-[#103120] hover:underline">
+                    Daftar Sekarang
+                </a>
+            </p>
+
+            <form method="dialog" class="mt-4">
+                <button class="w-full bg-gray-200 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">
+                    Tutup
+                </button>
+            </form>
         </div>
     </dialog>
+@endguest
 
     <dialog id="registerModal" class="bg-transparent p-0 rounded-xl shadow-2xl">
         <div class="bg-white p-8 w-[400px] relative rounded-xl border border-gray-100">
@@ -76,6 +99,10 @@
                 <div class="mb-6">
                     <label class="block text-sm font-bold mb-1 text-gray-700">Password</label>
                     <input type="password" name="password" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Password Anda" required>
+                </div>
+                <div class="mb-6"></div>
+                    <label class="block text-sm font-bold mb-1 text-gray-700">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Konfirmasi Password Anda" required>
                 </div>
                 <button type="submit" class="w-full bg-[#103120] text-white py-3 rounded-lg font-bold hover:bg-green-900 transition shadow-lg transform hover:-translate-y-0.5">Register</button>
             </form>

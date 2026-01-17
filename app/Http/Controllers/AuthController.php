@@ -2,72 +2,173 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 
 class AuthController extends Controller
 {
-    // Menampilkan halaman login
+    /**
+     * ========================================
+     * CUSTOMER LOGIN - MENGGUNAKAN EMAIL
+     * ========================================
+     */
+
+    /**
+     * Tampilkan form login customer (email)
+     */
     public function showLoginForm()
     {
-        return view('admin.auth.login'); // Pastikan kamu punya file resources/views/auth/login.blade.php
+        // Karena login customer pakai modal di homepage, arahkan ke home jika diakses manual
+        return redirect()->route('customer.home');
     }
 
-    // Proses Login
+    public function showRegisterForm()
+    {
+        return redirect()->route('customer.home');
+    }
+
+    /**
+     * Proses login customer dengan email
+     */
     public function login(Request $request)
     {
         $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
+            'email' => ['required', 'email', 'exists:users,email'],
+            'password' => ['required', 'string', 'min:6'],
+        ], [
+            'email.required' => 'Email wajib diisi',
+            'email.email' => 'Format email tidak valid',
+            'email.exists' => 'Email tidak terdaftar',
+            'password.required' => 'Password wajib diisi',
         ]);
 
-        if (Auth::attempt($credentials)) {
-            $request->session()->regenerate();
-
-            // CEK ROLE: Jika admin, lempar ke dashboard admin
-            if (Auth::user()->role === 'admin') {
-                return redirect()->route('admin.dashboard');
-            }
-
-            // Jika user biasa, lempar ke home
-            return redirect()->route('home');
+        // Pastikan user adalah customer, bukan admin
+        $user = User::firstWhere('email', $credentials['email']);
+        if ($user && $user->role === 'admin') {
+            return back()->withErrors(['email' => 'Akses ditolak. Silakan login di halaman admin.'])->withInput();
         }
 
-        return back()->withErrors([
-            'username' => 'Username atau password salah.',
-        ])->onlyInput('username');
+        // Attempt login dengan guard 'web'
+        if (Auth::guard('web')->attempt(['email' => $credentials['email'], 'password' => $credentials['password']], $request->filled('remember'))) {
+            $request->session()->regenerate();
+            return redirect()->intended(route('customer.home'))->with('success', 'Berhasil login!');
+        }
+
+        return back()->withErrors(['password' => 'Password salah'])->withInput();
     }
 
-    // Proses Register (Untuk Customer)
+    /**
+     * Proses Register (Untuk Customer)
+     */
+   // --- Bagian Register di AuthController.php ---
     public function register(Request $request)
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'username' => 'required|string|unique:users',
             'email' => 'required|string|email|unique:users',
-            'password' => 'required|string|min:6',
+            'phone' => 'required|string',
+            'password' => 'required|string|min:6|confirmed', // 'confirmed' mencari password_confirmation
         ]);
+
+        // Generate username otomatis agar database tidak error
+        $username = explode('@', $request->email)[0] . rand(100, 999);
 
         User::create([
             'name' => $request->name,
-            'username' => $request->username,
             'email' => $request->email,
+            'username' => $username,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role' => 'user', // Default role saat daftar adalah user
+            'role' => 'customer',
         ]);
 
-        return redirect()->route('login')->with('success', 'Registrasi berhasil, silakan login.');
+        // Buka modal login setelah register berhasil dengan mengirimkan pesan
+        return redirect()->route('customer.home')->with('success', 'Registrasi berhasil, silakan login.');
     }
 
-    // Proses Logout
+    /**
+     * ========================================
+     * ADMIN LOGIN - MENGGUNAKAN USERNAME
+     * ========================================
+     */
+
+    /**
+     * Tampilkan form login admin (username)
+     */
+    public function showAdminLoginForm()
+    {
+        // Pastikan guard 'admin' sudah terdefinisi di config/auth.php sebelum ini dipanggil
+        if (Auth::guard('admin')->check()) {
+            return redirect()->route('admin.dashboard');
+        }
+
+        // Pastikan view ini ada sesuai struktur folder Anda
+        return view('admin.auth.login');
+    }
+
+    /**
+     * Proses login admin dengan username
+     */
+    public function adminLogin(Request $request)
+    {
+        $credentials = $request->validate([
+            'username' => 'required|string',
+            'password' => 'required|string',
+        ]);
+
+        \Log::info('Attempt login:', ['username' => $credentials['username']]);
+
+        $user = \App\Models\User::where('username', $credentials['username'])->first();
+
+        if (!$user) {
+            \Log::warning('User not found:', ['username' => $credentials['username']]);
+            return back()->withErrors(['username' => 'Username tidak ditemukan.']);
+        }
+
+        \Log::info('User found:', ['username' => $user->username, 'role' => $user->role]);
+
+        if ($user->role !== 'admin') {
+            \Log::warning('User is not admin:', ['username' => $user->username]);
+            return back()->withErrors(['username' => 'Anda bukan admin.']);
+        }
+
+        if (Auth::guard('admin')->attempt($credentials)) {
+            \Log::info('Login successful:', ['username' => $user->username]);
+            $request->session()->regenerate();
+            return redirect()->intended(route('admin.dashboard'));
+        }
+
+        \Log::warning('Password incorrect:', ['username' => $credentials['username']]);
+        return back()->withErrors(['password' => 'Password salah.']);
+    }
+
+    /**
+     * ========================================
+     * LOGOUT
+     * ========================================
+     */
+
+    /**
+     * Logout customer
+     */
     public function logout(Request $request)
     {
-        Auth::logout();
+        Auth::guard('web')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/');
+        return redirect(route('customer.home'))->with('success', 'Berhasil logout!');
+    }
+
+    /**
+     * Logout admin
+     */
+    public function adminLogout(Request $request)
+    {
+        Auth::guard('admin')->logout();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+        return redirect(route('admin.login'))->with('success', 'Berhasil logout!');
     }
 }

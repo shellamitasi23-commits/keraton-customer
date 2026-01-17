@@ -4,10 +4,31 @@
 
 @section('content')
 <div class="page-header">
-    <h3 class="page-title"> Kelola Merchandise Keraton </h3>
+    <h3 class="page-title">Kelola Merchandise Keraton</h3>
 </div>
 
+{{-- Statistics Cards --}}
 <div class="row">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">{{ $products->count() }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-primary">
+                            <span class="mdi mdi-package-variant icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Total Produk</h6>
+            </div>
+        </div>
+    </div>
+
     <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -23,18 +44,38 @@
                         </div>
                     </div>
                 </div>
-                <h6 class="text-muted font-weight-normal">Produk Stok Menipis</h6>
+                <h6 class="text-muted font-weight-normal">Stok Menipis</h6>
             </div>
         </div>
     </div>
 
-    <div class="col-xl-9 col-sm-6 grid-margin stretch-card">
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
                 <div class="row">
                     <div class="col-9">
                         <div class="d-flex align-items-center align-self-start">
-                            <h3 class="mb-0">Rp{{ number_format($shopSales->sum('total_amount'), 0, ',', '.') }}</h3>
+                            <h3 class="mb-0">{{ $shopSales->count() }}</h3>
+                        </div>
+                    </div>
+                    <div class="col-3">
+                        <div class="icon icon-box-info">
+                            <span class="mdi mdi-cart icon-item"></span>
+                        </div>
+                    </div>
+                </div>
+                <h6 class="text-muted font-weight-normal">Total Transaksi</h6>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
+        <div class="card">
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-9">
+                        <div class="d-flex align-items-center align-self-start">
+                            <h3 class="mb-0">Rp{{ number_format($shopSales->sum('total_price'), 0, ',', '.') }}</h3>
                         </div>
                     </div>
                     <div class="col-3">
@@ -43,50 +84,205 @@
                         </div>
                     </div>
                 </div>
-                <h6 class="text-muted font-weight-normal">Total Penjualan Merchandise</h6>
+                <h6 class="text-muted font-weight-normal">Total Penjualan</h6>
             </div>
         </div>
     </div>
 </div>
 
+{{-- Products Table --}}
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Daftar Produk Merchandise</h4>
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <h4 class="card-title mb-0">Daftar Produk Merchandise</h4>
+                        <p class="card-description mb-0">Kelola produk yang dijual di toko</p>
+                    </div>
+                    <button class="btn btn-primary btn-sm" data-toggle="modal" data-target="#addProductModal">
+                        <i class="mdi mdi-plus"></i> Tambah Produk
+                    </button>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table table-bordered table-contextual">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th> Foto </th>
-                                <th> Nama Barang </th>
-                                <th> Harga </th>
-                                <th> Stok </th>
-                                <th> Status </th>
-                                <th> Aksi </th>
+                                <th style="width: 80px;">Foto</th>
+                                <th>Nama Produk</th>
+                                <th>Harga</th>
+                                <th>Stok</th>
+                                <th>Status</th>
+                                <th style="width: 120px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($products as $product)
-                            <tr>
+                            @forelse($products as $product)
+                            <tr class="{{ $product->stock < 10 ? 'table-warning' : '' }}">
                                 <td>
-                                    <img src="{{ asset('storage/' . $product->image) }}" alt="image" style="width: 50px; height: 50px; border-radius: 5px;" />
-                                </td>
-                                <td> {{ $product->name }} </td>
-                                <td> Rp{{ number_format($product->price, 0, ',', '.') }} </td>
-                                <td> {{ $product->stock }} unit </td>
-                                <td>
-                                    @if($product->stock > 0)
-                                        <div class="badge badge-success">Tersedia</div>
+                                    @if($product->image)
+                                        <img src="{{ asset('storage/' . $product->image) }}" 
+                                             alt="{{ $product->name }}"
+                                             class="product-thumbnail">
                                     @else
-                                        <div class="badge badge-danger">Habis</div>
+                                        <div class="no-image-placeholder">
+                                            <i class="mdi mdi-image-off"></i>
+                                        </div>
+                                    @endif
+                                </td>
+                                <td class="font-weight-bold">{{ $product->name }}</td>
+                                <td class="text-primary font-weight-bold">Rp{{ number_format($product->price, 0, ',', '.') }}</td>
+                                <td>
+                                    <span class="{{ $product->stock < 10 ? 'text-danger font-weight-bold' : '' }}">
+                                        {{ $product->stock }} unit
+                                    </span>
+                                </td>
+                                <td>
+                                    @if($product->stock > 10)
+                                        <span class="badge badge-success">Tersedia</span>
+                                    @elseif($product->stock > 0)
+                                        <span class="badge badge-warning">Stok Sedikit</span>
+                                    @else
+                                        <span class="badge badge-danger">Habis</span>
                                     @endif
                                 </td>
                                 <td>
-                                    <button class="btn btn-outline-warning btn-sm">Edit Stok</button>
+                                    <button class="btn btn-sm btn-outline-warning" 
+                                            data-toggle="modal" 
+                                            data-target="#editModal{{ $product->id }}"
+                                            title="Edit">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                    
+                                    <form action="{{ route('admin.shop.destroy', $product->id) }}" 
+                                          method="POST" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                                        @csrf
+                                        @method('DELETE')
+                                        <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
+                                    </form>
                                 </td>
                             </tr>
-                            @endforeach
+
+                            {{-- Edit Modal --}}
+                            <div class="modal fade" id="editModal{{ $product->id }}" tabindex="-1">
+                                <div class="modal-dialog modal-lg">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">Edit Produk</h5>
+                                            <button type="button" class="close" data-dismiss="modal">
+                                                <span>&times;</span>
+                                            </button>
+                                        </div>
+                                        <form action="{{ route('admin.shop.update', $product->id) }}" method="POST" enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Nama Produk</label>
+                                                            <input type="text" 
+                                                                   name="name" 
+                                                                   class="form-control @error('name') is-invalid @enderror" 
+                                                                   value="{{ old('name', $product->name) }}" 
+                                                                   required>
+                                                            @error('name')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Harga (Rp)</label>
+                                                            <input type="number" 
+                                                                   name="price" 
+                                                                   class="form-control @error('price') is-invalid @enderror" 
+                                                                   value="{{ old('price', $product->price) }}" 
+                                                                   min="0"
+                                                                   step="1000"
+                                                                   required>
+                                                            @error('price')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Deskripsi</label>
+                                                    <textarea name="description" 
+                                                              class="form-control @error('description') is-invalid @enderror" 
+                                                              rows="3" 
+                                                              required>{{ old('description', $product->description) }}</textarea>
+                                                    @error('description')
+                                                        <div class="invalid-feedback">{{ $message }}</div>
+                                                    @enderror
+                                                </div>
+
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Stok</label>
+                                                            <input type="number" 
+                                                                   name="stock" 
+                                                                   class="form-control @error('stock') is-invalid @enderror" 
+                                                                   value="{{ old('stock', $product->stock) }}" 
+                                                                   min="0"
+                                                                   required>
+                                                            @error('stock')
+                                                                <div class="invalid-feedback">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+
+                                                    <div class="col-md-6">
+                                                        <div class="form-group">
+                                                            <label>Foto Produk</label>
+                                                            <input type="file" 
+                                                                   name="image" 
+                                                                   class="form-control-file @error('image') is-invalid @enderror" 
+                                                                   accept="image/*">
+                                                            <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto</small>
+                                                            @error('image')
+                                                                <div class="invalid-feedback d-block">{{ $message }}</div>
+                                                            @enderror
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                @if($product->image)
+                                                    <div class="form-group">
+                                                        <label>Foto Saat Ini:</label><br>
+                                                        <img src="{{ asset('storage/' . $product->image) }}" 
+                                                             alt="{{ $product->name }}"
+                                                             style="max-width: 200px; border-radius: 8px; border: 2px solid #ddd;">
+                                                    </div>
+                                                @endif
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="mdi mdi-content-save"></i> Simpan Perubahan
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="mdi mdi-package-variant-closed" style="font-size: 48px; opacity: 0.3;"></i>
+                                    <p class="mt-2">Belum ada produk merchandise</p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -95,32 +291,146 @@
     </div>
 </div>
 
+{{-- Add Product Modal --}}
+<div class="modal fade" id="addProductModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Tambah Produk Baru</h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <form action="{{ route('admin.shop.store') }}" method="POST" enctype="multipart/form-data">
+                @csrf
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Nama Produk</label>
+                                <input type="text" 
+                                       name="name" 
+                                       class="form-control @error('name') is-invalid @enderror" 
+                                       placeholder="Contoh: Kaos Keraton"
+                                       value="{{ old('name') }}" 
+                                       required>
+                                @error('name')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Harga (Rp)</label>
+                                <input type="number" 
+                                       name="price" 
+                                       class="form-control @error('price') is-invalid @enderror" 
+                                       value="{{ old('price') }}" 
+                                       min="0"
+                                       step="1000"
+                                       placeholder="75000"
+                                       required>
+                                @error('price')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Deskripsi</label>
+                        <textarea name="description" 
+                                  class="form-control @error('description') is-invalid @enderror" 
+                                  rows="3" 
+                                  placeholder="Jelaskan tentang produk ini..."
+                                  required>{{ old('description') }}</textarea>
+                        @error('description')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Stok Awal</label>
+                                <input type="number" 
+                                       name="stock" 
+                                       class="form-control @error('stock') is-invalid @enderror" 
+                                       value="{{ old('stock', 0) }}" 
+                                       min="0"
+                                       required>
+                                @error('stock')
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                <label>Foto Produk</label>
+                                <input type="file" 
+                                       name="image" 
+                                       class="form-control-file @error('image') is-invalid @enderror" 
+                                       accept="image/*"
+                                       required>
+                                <small class="form-text text-muted">Format: JPG, PNG, JPEG (Max: 2MB)</small>
+                                @error('image')
+                                    <div class="invalid-feedback d-block">{{ $message }}</div>
+                                @enderror
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="mdi mdi-plus"></i> Tambah Produk
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{{-- Transaction History --}}
 <div class="row">
     <div class="col-12 grid-margin">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Riwayat Transaksi Shop</h4>
+                <h4 class="card-title mb-4">Riwayat Transaksi Shop</h4>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th> Client </th>
-                                <th> Order ID </th>
-                                <th> Total Belanja </th>
-                                <th> Tanggal </th>
-                                <th> Status </th>
+                                <th>Customer</th>
+                                <th>Order No</th>
+                                <th>Item</th>
+                                <th>Total Belanja</th>
+                                <th>Tanggal</th>
+                                <th>Status</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($shopSales as $order)
+                            @forelse($shopSales as $order)
                             <tr>
-                                <td> {{ $order->user->name }} </td>
-                                <td> #ORD-{{ $order->id }} </td>
-                                <td> Rp{{ number_format($order->total_amount, 0, ',', '.') }} </td>
-                                <td> {{ $order->created_at->format('d M Y') }} </td>
-                                <td> <label class="badge badge-success">Paid</label> </td>
+                                <td>{{ $order->user->name }}</td>
+                                <td class="font-weight-bold">{{ $order->order_number }}</td>
+                                <td>{{ $order->items->count() }} item</td>
+                                <td class="text-success font-weight-bold">Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
+                                <td>{{ $order->created_at->format('d M Y H:i') }}</td>
+                                <td>
+                                    <span class="badge badge-success">Lunas</span>
+                                </td>
                             </tr>
-                            @endforeach
+                            @empty
+                            <tr>
+                                <td colspan="6" class="text-center py-4 text-muted">
+                                    <i class="mdi mdi-cart-outline" style="font-size: 48px; opacity: 0.3;"></i>
+                                    <p class="mt-2">Belum ada transaksi shop</p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>
@@ -128,4 +438,26 @@
         </div>
     </div>
 </div>
+
+<style>
+.product-thumbnail {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 2px solid #e9ecef;
+}
+
+.no-image-placeholder {
+    width: 60px;
+    height: 60px;
+    background: #e9ecef;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 24px;
+}
+</style>
 @endsection

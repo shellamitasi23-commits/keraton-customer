@@ -7,31 +7,63 @@
     <div class="col-md-4 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Tambah Data Museum</h4>
+                <h4 class="card-title mb-4">Tambah Museum Baru</h4>
+                
+                @if(session('success'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        <strong>Berhasil!</strong> {{ session('success') }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                @endif
+
                 <form action="{{ route('admin.museum.store') }}" method="POST" enctype="multipart/form-data">
                     @csrf
+                    
                     <div class="form-group">
-                        <label>Nama Museum</label>
-                        <input type="text" name="nama" class="form-control text-white @error('nama') is-invalid @enderror" required value="{{ old('nama') }}">
+                        <label for="nama">Nama Museum</label>
+                        <input type="text" 
+                               id="nama"
+                               name="nama" 
+                               class="form-control @error('nama') is-invalid @enderror" 
+                               placeholder="Masukkan nama museum"
+                               value="{{ old('nama') }}" 
+                               required>
                         @error('nama')
-                            <small class="text-danger">{{ $message }}</small>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
-                        <label>Deskripsi</label>
-                        <textarea name="deskripsi" class="form-control text-white @error('deskripsi') is-invalid @enderror" rows="4" required>{{ old('deskripsi') }}</textarea>
+                        <label for="deskripsi">Deskripsi</label>
+                        <textarea id="deskripsi"
+                                  name="deskripsi" 
+                                  class="form-control @error('deskripsi') is-invalid @enderror" 
+                                  rows="5" 
+                                  placeholder="Jelaskan tentang museum..."
+                                  required>{{ old('deskripsi') }}</textarea>
                         @error('deskripsi')
-                            <small class="text-danger">{{ $message }}</small>
+                            <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
+
                     <div class="form-group">
-                        <label>Foto Museum</label>
-                        <input type="file" name="foto" class="form-control @error('foto') is-invalid @enderror" accept="image/*">
+                        <label for="foto">Foto Museum</label>
+                        <input type="file" 
+                               id="foto"
+                               name="foto" 
+                               class="form-control-file @error('foto') is-invalid @enderror" 
+                               accept="image/*">
+                        <small class="form-text text-muted">Format: JPG, PNG, JPEG (Max: 2MB)</small>
                         @error('foto')
-                            <small class="text-danger">{{ $message }}</small>
+                            <div class="invalid-feedback d-block">{{ $message }}</div>
                         @enderror
                     </div>
-                    <button type="submit" class="btn btn-primary mr-2">Simpan</button>
+
+                    <button type="submit" class="btn btn-primary btn-fw">
+                        <i class="mdi mdi-content-save mr-1"></i> Simpan Data
+                    </button>
                 </form>
             </div>
         </div>
@@ -40,37 +72,94 @@
     <div class="col-md-8 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <h4 class="card-title">Daftar Museum</h4>
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h4 class="card-title mb-0">Daftar Museum</h4>
+                    <span class="badge badge-info">{{ $museums->count() }} Museum</span>
+                </div>
+
                 <div class="table-responsive">
-                    <table class="table">
+                    <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th> Foto </th>
-                                <th> Nama </th>
-                                <th> Deskripsi </th>
-                                <th> Aksi </th>
+                                <th style="width: 100px;">Foto</th>
+                                <th>Nama Museum</th>
+                                <th>Deskripsi</th>
+                                <th style="width: 100px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach($museums as $m)
+                            @forelse($museums as $museum)
                             <tr>
                                 <td>
-                                    @if($m->foto)
-                                        <img src="{{ asset('storage/'.$m->foto) }}" alt="image" />
+                                    @if($museum->foto)
+                                        <img src="{{ asset('storage/'.$museum->foto) }}" 
+                                             alt="{{ $museum->nama }}"
+                                             class="museum-thumbnail">
                                     @else
-                                        <div class="badge badge-outline-secondary">No Image</div>
+                                        <div class="no-image-placeholder">
+                                            <i class="mdi mdi-image-off"></i>
+                                        </div>
                                     @endif
                                 </td>
-                                <td> {{ $m->nama }} </td>
-                                <td> {{ Str::limit($m->deskripsi, 50) }} </td>
+                                <td class="font-weight-bold">{{ $museum->nama }}</td>
+                                <td>{{ Str::limit($museum->deskripsi, 80) }}</td>
                                 <td>
-                                    <form action="{{ route('admin.museum.destroy', $m->id) }}" method="POST">
-                                        @csrf @method('DELETE')
-                                        <button type="submit" class="btn btn-outline-danger btn-sm" onclick="return confirm('Hapus?')">Hapus</button>
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-info mr-1" 
+                                            data-toggle="modal" 
+                                            data-target="#viewModal{{ $museum->id }}"
+                                            title="Lihat Detail">
+                                        <i class="mdi mdi-eye"></i>
+                                    </button>
+                                    
+                                    <form action="{{ route('admin.museum.destroy', $museum->id) }}" 
+                                          method="POST" 
+                                          class="d-inline"
+                                          onsubmit="return confirm('Yakin ingin menghapus museum ini?')">
+                                        @csrf 
+                                        @method('DELETE')
+                                        <button type="submit" 
+                                                class="btn btn-sm btn-outline-danger" 
+                                                title="Hapus">
+                                            <i class="mdi mdi-delete"></i>
+                                        </button>
                                     </form>
                                 </td>
                             </tr>
-                            @endforeach
+
+                            {{-- Modal Detail --}}
+                            <div class="modal fade" id="viewModal{{ $museum->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h5 class="modal-title">{{ $museum->nama }}</h5>
+                                            <button type="button" class="close" data-dismiss="modal">
+                                                <span>&times;</span>
+                                            </button>
+                                        </div>
+                                        <div class="modal-body">
+                                            @if($museum->foto)
+                                                <img src="{{ asset('storage/'.$museum->foto) }}" 
+                                                     class="img-fluid rounded mb-3" 
+                                                     alt="{{ $museum->nama }}">
+                                            @endif
+                                            <p class="text-muted mb-2"><strong>Deskripsi:</strong></p>
+                                            <p>{{ $museum->deskripsi }}</p>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-secondary" data-dismiss="modal">Tutup</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            @empty
+                            <tr>
+                                <td colspan="4" class="text-center py-5 text-muted">
+                                    <i class="mdi mdi-folder-open-outline" style="font-size: 48px; opacity: 0.3;"></i>
+                                    <p class="mt-2">Belum ada data museum</p>
+                                </td>
+                            </tr>
+                            @endforelse
                         </tbody>
                     </table>
                 </div>

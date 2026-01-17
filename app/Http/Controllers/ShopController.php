@@ -22,66 +22,92 @@ class ShopController extends Controller
     }
 
     // Menambah barang ke keranjang
-    public function addToCart($id)
+    public function addToCart(Request $request, $id)
     {
-        // Cek apakah user sudah punya produk ini di keranjang?
-        $existingCart = Cart::where('user_id', Auth::id())
+        $product = Product::findOrFail($id);
+
+        // Validasi stok
+        if ($product->stock < 1) {
+            return back()->with('error', 'Produk habis!');
+        }
+
+        $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . $product->stock
+        ]);
+
+        $quantity = $request->quantity;
+
+        // Cek apakah produk sudah ada di cart
+        $cart = Cart::where('user_id', Auth::id())
             ->where('product_id', $id)
             ->first();
 
-        if ($existingCart) {
-            // Jika ada, tambah jumlahnya
-            $existingCart->increment('quantity');
+        if ($cart) {
+            // Update quantity jika sudah ada
+            $newQuantity = $cart->quantity + $quantity;
+
+            if ($newQuantity > $product->stock) {
+                return back()->with('error', 'Jumlah melebihi stok tersedia!');
+            }
+
+            $cart->update(['quantity' => $newQuantity]);
         } else {
-            // Jika belum, buat baru
+            // Tambah baru ke cart
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $id,
-                'quantity' => 1
+                'quantity' => $quantity,
             ]);
         }
 
-        return redirect()->route('shop.cart')->with('success', 'Produk masuk keranjang!');
+        return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
 
     // Menampilkan isi keranjang
-    public function cart()
-    {
-        $carts = Cart::with('product')->where('user_id', Auth::id())->get();
+  public function cart()
+{
+    $carts = Cart::where('user_id', Auth::id())
+        ->with('product')
+        ->get();
 
-        // Hitung total belanjaan
-        $subtotal = $carts->sum(function ($item) {
-            return $item->product->price * $item->quantity;
-        });
+    // Hitung subtotal
+    $subtotal = $carts->sum(function ($cart) {
+        return $cart->product->price * $cart->quantity;
+    });
 
-        return view('customer.pages.shop.cart', compact('carts', 'subtotal'));
-    }
-    // Tambahkan method ini di dalam ShopController
+    // Hitung ongkir & total
+    $shippingPrice = 15000; // JNE
+    $total = $subtotal + $shippingPrice;
+
+    // Kirim semua variabel ke view
+    return view('customer.pages.shop.cart', compact('carts', 'subtotal', 'shippingPrice', 'total'));
+}
 
     // Update quantity (increase/decrease)
     public function updateCart(Request $request, $id)
     {
-        $cart = Cart::where('user_id', Auth::id())->findOrFail($id);
+        $cart = Cart::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
 
-        if ($request->action === 'increase') {
-            $cart->increment('quantity');
-        } elseif ($request->action === 'decrease') {
-            if ($cart->quantity > 1) {
-                $cart->decrement('quantity');
-            } else {
-                // Jika quantity = 1 dan dikurangi, hapus item
-                $cart->delete();
-                return back()->with('success', 'Item dihapus dari keranjang.');
-            }
-        }
+        $request->validate([
+            'quantity' => 'required|integer|min:1|max:' . $cart->product->stock
+        ]);
 
-        return back()->with('success', 'Keranjang diperbarui.');
+        $cart->update(['quantity' => $request->quantity]);
+
+        return back()->with('success', 'Keranjang berhasil diupdate!');
     }
     // Menghapus item dari keranjang
     public function deleteCart($id)
     {
-        Cart::where('user_id', Auth::id())->where('id', $id)->delete();
-        return back()->with('success', 'Item dihapus dari keranjang.');
+        $cart = Cart::where('user_id', Auth::id())
+            ->where('id', $id)
+            ->firstOrFail();
+
+        $cart->delete();
+
+        return back()->with('success', 'Produk dihapus dari keranjang!');
     }
 
     // --- BAGIAN 2: CHECKOUT & PEMBAYARAN ---
@@ -89,65 +115,69 @@ class ShopController extends Controller
     // Menampilkan form alamat (Checkout)
     public function checkout()
     {
-        $carts = Cart::with('product')->where('user_id', Auth::id())->get();
+        $cartItems = Cart::where('user_id', auth()->id())
+            ->with('product')
+            ->get();
 
-        if ($carts->isEmpty()) {
-            return redirect()->route('shop.index');
-        }
+        $subtotal = $cartItems->sum(function ($item) {
+            return $item->product->price * $item->quantity;
+        });
 
-        // Hitung-hitungan biaya
-        $subtotal = $carts->sum(fn($item) => $item->product->price * $item->quantity);
-        $shipping = 15000; // Ongkir Fixed (Contoh)
-        $service = 5000;   // Biaya Layanan
-        $grandTotal = $subtotal + $shipping + $service;
+        $shippingPrice = 15000;
+        $grandTotal = $subtotal + $shippingPrice;
 
-        return view('customer.pages.shop.checkout', compact('carts', 'subtotal', 'shipping', 'service', 'grandTotal'));
+        return view(
+            'customer.pages.shop.checkout',
+            compact('cartItems', 'subtotal', 'shippingPrice', 'grandTotal')
+        );
     }
 
-    // Proses Simpan Order (Pindah dari Cart ke Order)
     public function processCheckout(Request $request)
-    {
-        $request->validate([
-            'address' => 'required',
-            'postal_code' => 'required',
-            'whatsapp' => 'required',
-        ]);
+{
+    $request->validate([
+        'address' => 'required|string|max:500',
+        'postal_code' => 'required|string|max:10',
+    ]);
 
-        $carts = Cart::with('product')->where('user_id', Auth::id())->get();
+    $carts = Cart::where('user_id', Auth::id())->with('product')->get();
 
-        // Hitung ulang total di server
-        $subtotal = $carts->sum(fn($item) => $item->product->price * $item->quantity);
-        $grandTotal = $subtotal + 15000 + 5000;
-
-        // 1. Buat Data Order Utama
-        $order = Order::create([
-            'user_id' => Auth::id(),
-            'order_number' => 'INV/MRC/' . date('Y') . '/' . strtoupper(Str::random(6)),
-            'address' => $request->address,
-            'postal_code' => $request->postal_code,
-            'whatsapp' => $request->whatsapp,
-            'subtotal' => $subtotal,
-            'shipping_price' => 15000,
-            'total_price' => $grandTotal,
-            'status' => 'pending'
-        ]);
-
-        // 2. Pindahkan Detail Barang ke OrderItems
-        foreach ($carts as $cart) {
-            OrderItem::create([
-                'order_id' => $order->id,
-                'product_id' => $cart->product_id,
-                'quantity' => $cart->quantity,
-                'price' => $cart->product->price
-            ]);
-        }
-
-        // 3. Hapus Keranjang karena sudah dipesan
-        Cart::where('user_id', Auth::id())->delete();
-
-        // 4. Lanjut ke Pembayaran
-        return redirect()->route('shop.payment', $order->id);
+    if ($carts->isEmpty()) {
+        return redirect()->route('shop.index')->with('error', 'Keranjang kosong!');
     }
+
+    // Hitung total
+    $subtotal = $carts->sum(fn($c) => $c->product->price * $c->quantity);
+    $shippingPrice = 15000;
+    $total = $subtotal + $shippingPrice;
+
+    // Buat Order
+    $order = Order::create([
+        'user_id' => Auth::id(),
+        'order_number' => 'ORD-' . strtoupper(Str::random(10)),
+        'address' => $request->address,
+        'postal_code' => $request->postal_code,
+        'subtotal' => $subtotal,
+        'shipping_price' => $shippingPrice,
+        'total_price' => $total,
+        'status' => 'pending',
+    ]);
+
+    // Buat Order Items
+    foreach ($carts as $cart) {
+        OrderItem::create([
+            'order_id' => $order->id,
+            'product_id' => $cart->product_id,
+            'quantity' => $cart->quantity,
+            'price' => $cart->product->price,
+        ]);
+    }
+
+    // Hapus cart setelah checkout
+    Cart::where('user_id', Auth::id())->delete();
+
+    return redirect()->route('shop.payment', $order->id);
+}
+
 
     // Halaman Pilih Metode Pembayaran
     public function payment($id)
