@@ -30,12 +30,13 @@
           <i class="mdi mdi-account-circle"></i>
           {{ Auth::user()->name ?? 'Admin' }}
         </a>
-        <div class="dropdown-menu dropdown-menu-right">
-          <a class="dropdown-item" href="#"
-             onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-            <i class="mdi mdi-logout text-danger"></i> Logout
-          </a>
-        </div>
+        <form method="POST" action="{{ route('admin.logout') }}" class="d-inline">
+    @csrf
+    <button type="submit" class="dropdown-item">
+        <i class="mdi mdi-logout text-danger"></i>
+        Logout
+    </button>
+</form> 
       </li>
     </ul>
   </div>
@@ -125,5 +126,6 @@
     <script src="{{ asset('admin-assets/vendors/js/vendor.bundle.base.js') }}"></script>
     <script src="{{ asset('admin-assets/js/off-canvas.js') }}"></script>
     <script src="{{ asset('admin-assets/js/misc.js') }}"></script>
+    @stack('scripts')
 </body>
 </html>

@@ -14,7 +14,28 @@
             <a href="{{ route('shop.cart') }}" class="underline ml-2 hover:text-green-900">Lihat Keranjang</a>
         </div>
     @endif
+{{-- Alert Success/Error (Taruh di atas produk list) --}}
+@if(session('success'))
+    <div class="fixed top-24 right-4 bg-green-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-fade-in">
+        ✓ {{ session('success') }}
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelector('.animate-fade-in').style.display = 'none';
+        }, 3000);
+    </script>
+@endif
 
+@if(session('error'))
+    <div class="fixed top-24 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50">
+        ✗ {{ session('error') }}
+    </div>
+    <script>
+        setTimeout(() => {
+            document.querySelector('.bg-red-500').style.display = 'none';
+        }, 3000);
+    </script>
+@endif
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         
         @foreach($products as $product)

@@ -9,23 +9,27 @@ use App\Models\User;
 
 class DashboardController extends Controller
 {
-    public function index()
-    {
-        // Hitung total untuk angka di atas
-        $totalTickets = TicketTransaction::count();
-        $merchRevenue = Order::where('status', 'success')->sum('total_price');
-        $totalUsers = User::count();
+   public function index()
+{
+    // Total tiket terjual
+    $totalTickets = TicketTransaction::count();
 
-        // Data Statis untuk Grafik Kunjungan
-        $chartLabels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
-        $chartData = [120, 150, 100, 200];
+    // Pendapatan Merchandise - PERBAIKI INI
+     $merchRevenue = Order::sum('total_price');
 
-        return view('admin.dashboard', compact(
-            'totalTickets',
-            'merchRevenue',
-            'totalUsers',
-            'chartLabels',
-            'chartData'
-        ));
-    }
+    // Total users (sudah benar)
+    $totalUsers = User::count();
+
+    // Data untuk chart
+    $chartLabels = ['Minggu 1', 'Minggu 2', 'Minggu 3', 'Minggu 4'];
+    $chartData = [120, 150, 100, 200];
+
+    return view('admin.dashboard', compact(
+        'totalTickets',
+        'merchRevenue',
+        'totalUsers',
+        'chartLabels',
+        'chartData'
+    ));
+}
 }

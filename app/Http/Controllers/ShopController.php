@@ -26,24 +26,21 @@ class ShopController extends Controller
     {
         $product = Product::findOrFail($id);
 
-        // Validasi stok
         if ($product->stock < 1) {
             return back()->with('error', 'Produk habis!');
         }
 
-        $request->validate([
-            'quantity' => 'required|integer|min:1|max:' . $product->stock
-        ]);
+        $quantity = $request->quantity ?? 1;
 
-        $quantity = $request->quantity;
+        if ($quantity > $product->stock) {
+            return back()->with('error', 'Jumlah melebihi stok tersedia!');
+        }
 
-        // Cek apakah produk sudah ada di cart
         $cart = Cart::where('user_id', Auth::id())
             ->where('product_id', $id)
             ->first();
 
         if ($cart) {
-            // Update quantity jika sudah ada
             $newQuantity = $cart->quantity + $quantity;
 
             if ($newQuantity > $product->stock) {
@@ -52,7 +49,6 @@ class ShopController extends Controller
 
             $cart->update(['quantity' => $newQuantity]);
         } else {
-            // Tambah baru ke cart
             Cart::create([
                 'user_id' => Auth::id(),
                 'product_id' => $id,
@@ -62,7 +58,6 @@ class ShopController extends Controller
 
         return back()->with('success', 'Produk berhasil ditambahkan ke keranjang!');
     }
-
     // Menampilkan isi keranjang
   public function cart()
 {

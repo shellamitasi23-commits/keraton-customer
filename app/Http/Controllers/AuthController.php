@@ -67,25 +67,26 @@ class AuthController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255',
-            'email' => 'required|string|email|unique:users',
-            'phone' => 'required|string',
-            'password' => 'required|string|min:6|confirmed', // 'confirmed' mencari password_confirmation
+            'email' => 'required|email|unique:users,email',
+            'phone' => 'required|string|max:15',
+            'password' => 'required|min:6|confirmed',
         ]);
 
-        // Generate username otomatis agar database tidak error
-        $username = explode('@', $request->email)[0] . rand(100, 999);
-
-        User::create([
+        // Buat user baru
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
-            'username' => $username,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
             'role' => 'customer',
+            'email_verified_at' => now(), // Auto verify
         ]);
 
-        // Buka modal login setelah register berhasil dengan mengirimkan pesan
-        return redirect()->route('customer.home')->with('success', 'Registrasi berhasil, silakan login.');
+        // Auto login setelah register
+        Auth::guard('web')->login($user);
+
+        // Redirect ke home dengan session success
+        return redirect()->route('customer.home')->with('success', 'Registrasi berhasil! Selamat datang ' . $user->name);
     }
 
     /**
@@ -166,9 +167,14 @@ class AuthController extends Controller
      */
     public function adminLogout(Request $request)
     {
+        // Pastikan hanya logout guard admin
         Auth::guard('admin')->logout();
+
+        // Invalidate session
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect(route('admin.login'))->with('success', 'Berhasil logout!');
+
+        // Redirect ke login admin
+        return redirect()->route('admin.login')->with('success', 'Berhasil logout!');
     }
 }

@@ -4,6 +4,7 @@
 
 @section('content')
 <div class="row">
+    {{-- FORM CREATE (sudah ada, tidak perlu diubah) --}}
     <div class="col-md-4 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -12,6 +13,15 @@
                 @if(session('success'))
                     <div class="alert alert-success alert-dismissible fade show" role="alert">
                         <strong>Berhasil!</strong> {{ session('success') }}
+                        <button type="button" class="close" data-dismiss="alert">
+                            <span>&times;</span>
+                        </button>
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                        <strong>Error!</strong> {{ session('error') }}
                         <button type="button" class="close" data-dismiss="alert">
                             <span>&times;</span>
                         </button>
@@ -69,6 +79,7 @@
         </div>
     </div>
 
+    {{-- TABLE LIST --}}
     <div class="col-md-8 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -84,7 +95,7 @@
                                 <th style="width: 100px;">Foto</th>
                                 <th>Nama Museum</th>
                                 <th>Deskripsi</th>
-                                <th style="width: 100px;">Aksi</th>
+                                <th style="width: 150px;">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -94,9 +105,10 @@
                                     @if($museum->foto)
                                         <img src="{{ asset('storage/'.$museum->foto) }}" 
                                              alt="{{ $museum->nama }}"
-                                             class="museum-thumbnail">
+                                             class="museum-thumbnail"
+                                             style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px;">
                                     @else
-                                        <div class="no-image-placeholder">
+                                        <div class="no-image-placeholder" style="width: 80px; height: 80px; background: #f0f0f0; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
                                             <i class="mdi mdi-image-off"></i>
                                         </div>
                                     @endif
@@ -104,6 +116,15 @@
                                 <td class="font-weight-bold">{{ $museum->nama }}</td>
                                 <td>{{ Str::limit($museum->deskripsi, 80) }}</td>
                                 <td>
+                                    {{-- ✅ TOMBOL EDIT (TAMBAHAN BARU) --}}
+                                    <button type="button" 
+                                            class="btn btn-sm btn-outline-warning mr-1" 
+                                            data-toggle="modal" 
+                                            data-target="#editModal{{ $museum->id }}"
+                                            title="Edit">
+                                        <i class="mdi mdi-pencil"></i>
+                                    </button>
+                                    
                                     <button type="button" 
                                             class="btn btn-sm btn-outline-info mr-1" 
                                             data-toggle="modal" 
@@ -127,7 +148,74 @@
                                 </td>
                             </tr>
 
-                            {{-- Modal Detail --}}
+                            {{-- ✅ MODAL EDIT (TAMBAHAN BARU) --}}
+                            <div class="modal fade" id="editModal{{ $museum->id }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form action="{{ route('admin.museum.update', $museum->id) }}" 
+                                              method="POST" 
+                                              enctype="multipart/form-data">
+                                            @csrf
+                                            @method('PUT')
+                                            
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Edit Museum</h5>
+                                                <button type="button" class="close" data-dismiss="modal">
+                                                    <span>&times;</span>
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="modal-body">
+                                                <div class="form-group">
+                                                    <label>Nama Museum</label>
+                                                    <input type="text" 
+                                                           name="nama" 
+                                                           class="form-control" 
+                                                           value="{{ $museum->nama }}" 
+                                                           required>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Deskripsi</label>
+                                                    <textarea name="deskripsi" 
+                                                              class="form-control" 
+                                                              rows="5" 
+                                                              required>{{ $museum->deskripsi }}</textarea>
+                                                </div>
+
+                                                <div class="form-group">
+                                                    <label>Foto Museum</label>
+                                                    @if($museum->foto)
+                                                        <div class="mb-2">
+                                                            <img src="{{ asset('storage/'.$museum->foto) }}" 
+                                                                 class="img-thumbnail" 
+                                                                 style="max-height: 150px;"
+                                                                 alt="Current">
+                                                            <p class="text-muted small mt-1">Foto saat ini</p>
+                                                        </div>
+                                                    @endif
+                                                    <input type="file" 
+                                                           name="foto" 
+                                                           class="form-control-file" 
+                                                           accept="image/*">
+                                                    <small class="form-text text-muted">
+                                                        Kosongkan jika tidak ingin mengubah foto
+                                                    </small>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                <button type="submit" class="btn btn-primary">
+                                                    <i class="mdi mdi-content-save mr-1"></i> Update
+                                                </button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                            {{-- Modal View (tidak perlu diubah) --}}
                             <div class="modal fade" id="viewModal{{ $museum->id }}" tabindex="-1">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
@@ -167,4 +255,4 @@
         </div>
     </div>
 </div>
-@endsection
+@endsection 

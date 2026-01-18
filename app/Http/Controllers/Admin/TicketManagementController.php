@@ -16,10 +16,11 @@ class TicketManagementController extends Controller
     public function index()
     {
         $categories = TicketCategory::all();
+
         $ticketSales = TicketTransaction::with(['user', 'ticketCategory'])
-                                        ->where('status', 'paid')
-                                        ->latest()
-                                        ->get();
+            ->where('status', 'paid')
+            ->latest()
+            ->get();
 
         return view('admin.tickets.index', compact('categories', 'ticketSales'));
     }

@@ -3,6 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>Keraton Kasepuhan Cirebon</title>
     
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -100,11 +101,14 @@
                     <label class="block text-sm font-bold mb-1 text-gray-700">Password</label>
                     <input type="password" name="password" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Password Anda" required>
                 </div>
-                <div class="mb-6"></div>
+                <div class="mb-6">
                     <label class="block text-sm font-bold mb-1 text-gray-700">Konfirmasi Password</label>
                     <input type="password" name="password_confirmation" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Konfirmasi Password Anda" required>
                 </div>
-                <button type="submit" class="w-full bg-[#103120] text-white py-3 rounded-lg font-bold hover:bg-green-900 transition shadow-lg transform hover:-translate-y-0.5">Register</button>
+ <button type="submit" 
+                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+                    Register
+                </button>
             </form>
 
             <div class="mt-6 text-center text-sm">
@@ -119,6 +123,19 @@
         @if($errors->any())
             document.getElementById('loginModal').showModal();
         @endif
+
+         // Auto refresh CSRF token setiap 10 menit
+    setInterval(function() {
+        fetch('/refresh-csrf')
+            .then(response => response.json())
+            .then(data => {
+                document.querySelectorAll('input[name="_token"]').forEach(input => {
+                    input.value = data.token;
+                });
+                document.querySelector('meta[name="csrf-token"]').setAttribute('content', data.token);
+            })
+            .catch(error => console.error('CSRF refresh failed:', error));
+    }, 600000); // 10 menit
     </script>
 
 </body>

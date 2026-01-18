@@ -9,9 +9,9 @@ class MuseumController extends Controller
 {
     public function index()
     {
-        // Mengambil data yang baru di-CRUD Admin dari database
-        $museums = Museum::all();
-
+        $museums = Museum::latest('created_at')->get();
         return view('customer.pages.museum', compact('museums'));
+        // SESUAIKAN dengan path view Anda
+        // Kalau view ada di customer/museum.blade.php
     }
 }

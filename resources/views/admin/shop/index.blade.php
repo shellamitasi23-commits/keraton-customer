@@ -7,6 +7,39 @@
     <h3 class="page-title">Kelola Merchandise Keraton</h3>
 </div>
 
+{{-- Alert Messages --}}
+@if(session('success'))
+<div class="alert alert-success alert-dismissible fade show" role="alert">
+    <i class="mdi mdi-check-circle mr-2"></i>{{ session('success') }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
+
+@if(session('error'))
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <i class="mdi mdi-alert-circle mr-2"></i>{{ session('error') }}
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
+
+@if($errors->any())
+<div class="alert alert-danger alert-dismissible fade show" role="alert">
+    <strong>Terjadi kesalahan:</strong>
+    <ul class="mb-0 mt-2">
+        @foreach($errors->all() as $error)
+        <li>{{ $error }}</li>
+        @endforeach
+    </ul>
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+        <span aria-hidden="true">&times;</span>
+    </button>
+</div>
+@endif
+
 {{-- Statistics Cards --}}
 <div class="row">
     <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
@@ -124,7 +157,8 @@
                                     @if($product->image)
                                         <img src="{{ asset('storage/' . $product->image) }}" 
                                              alt="{{ $product->name }}"
-                                             class="product-thumbnail">
+                                             class="product-thumbnail"
+                                             onerror="this.onerror=null; this.parentElement.innerHTML='<div class=\'no-image-placeholder\'><i class=\'mdi mdi-image-off\'></i></div>';">
                                     @else
                                         <div class="no-image-placeholder">
                                             <i class="mdi mdi-image-off"></i>
@@ -158,7 +192,7 @@
                                     <form action="{{ route('admin.shop.destroy', $product->id) }}" 
                                           method="POST" 
                                           class="d-inline"
-                                          onsubmit="return confirm('Yakin ingin menghapus produk ini?')">
+                                          onsubmit="return confirm('Yakin ingin menghapus produk \'{{ $product->name }}\'?')">
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit" class="btn btn-sm btn-outline-danger" title="Hapus">
@@ -172,9 +206,11 @@
                             <div class="modal fade" id="editModal{{ $product->id }}" tabindex="-1">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
-                                        <div class="modal-header">
-                                            <h5 class="modal-title">Edit Produk</h5>
-                                            <button type="button" class="close" data-dismiss="modal">
+                                        <div class="modal-header bg-primary text-white">
+                                            <h5 class="modal-title">
+                                                <i class="mdi mdi-pencil mr-2"></i>Edit Produk
+                                            </h5>
+                                            <button type="button" class="close text-white" data-dismiss="modal">
                                                 <span>&times;</span>
                                             </button>
                                         </div>
@@ -185,7 +221,7 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Nama Produk</label>
+                                                            <label>Nama Produk <span class="text-danger">*</span></label>
                                                             <input type="text" 
                                                                    name="name" 
                                                                    class="form-control @error('name') is-invalid @enderror" 
@@ -199,7 +235,7 @@
 
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Harga (Rp)</label>
+                                                            <label>Harga (Rp) <span class="text-danger">*</span></label>
                                                             <input type="number" 
                                                                    name="price" 
                                                                    class="form-control @error('price') is-invalid @enderror" 
@@ -215,7 +251,7 @@
                                                 </div>
 
                                                 <div class="form-group">
-                                                    <label>Deskripsi</label>
+                                                    <label>Deskripsi <span class="text-danger">*</span></label>
                                                     <textarea name="description" 
                                                               class="form-control @error('description') is-invalid @enderror" 
                                                               rows="3" 
@@ -228,7 +264,7 @@
                                                 <div class="row">
                                                     <div class="col-md-6">
                                                         <div class="form-group">
-                                                            <label>Stok</label>
+                                                            <label>Stok <span class="text-danger">*</span></label>
                                                             <input type="number" 
                                                                    name="stock" 
                                                                    class="form-control @error('stock') is-invalid @enderror" 
@@ -247,7 +283,7 @@
                                                             <input type="file" 
                                                                    name="image" 
                                                                    class="form-control-file @error('image') is-invalid @enderror" 
-                                                                   accept="image/*">
+                                                                   accept="image/jpeg,image/png,image/jpg,image/gif">
                                                             <small class="form-text text-muted">Kosongkan jika tidak ingin mengubah foto</small>
                                                             @error('image')
                                                                 <div class="invalid-feedback d-block">{{ $message }}</div>
@@ -261,12 +297,18 @@
                                                         <label>Foto Saat Ini:</label><br>
                                                         <img src="{{ asset('storage/' . $product->image) }}" 
                                                              alt="{{ $product->name }}"
-                                                             style="max-width: 200px; border-radius: 8px; border: 2px solid #ddd;">
+                                                             style="max-width: 200px; border-radius: 8px; border: 2px solid #ddd;"
+                                                             onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                                                        <div style="display:none;" class="alert alert-warning mt-2">
+                                                            <i class="mdi mdi-alert"></i> Gambar tidak dapat dimuat
+                                                        </div>
                                                     </div>
                                                 @endif
                                             </div>
                                             <div class="modal-footer">
-                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
+                                                <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                                                    <i class="mdi mdi-close"></i> Batal
+                                                </button>
                                                 <button type="submit" class="btn btn-primary">
                                                     <i class="mdi mdi-content-save"></i> Simpan Perubahan
                                                 </button>
@@ -280,6 +322,9 @@
                                 <td colspan="6" class="text-center py-4 text-muted">
                                     <i class="mdi mdi-package-variant-closed" style="font-size: 48px; opacity: 0.3;"></i>
                                     <p class="mt-2">Belum ada produk merchandise</p>
+                                    <button class="btn btn-sm btn-primary mt-2" data-toggle="modal" data-target="#addProductModal">
+                                        <i class="mdi mdi-plus"></i> Tambah Produk Pertama
+                                    </button>
                                 </td>
                             </tr>
                             @endforelse
@@ -295,19 +340,21 @@
 <div class="modal fade" id="addProductModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Tambah Produk Baru</h5>
-                <button type="button" class="close" data-dismiss="modal">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="mdi mdi-plus-circle mr-2"></i>Tambah Produk Baru
+                </h5>
+                <button type="button" class="close text-white" data-dismiss="modal">
                     <span>&times;</span>
                 </button>
             </div>
-            <form action="{{ route('admin.shop.store') }}" method="POST" enctype="multipart/form-data">
+            <form action="{{ route('admin.shop.store') }}" method="POST" enctype="multipart/form-data" id="addProductForm">
                 @csrf
                 <div class="modal-body">
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Nama Produk</label>
+                                <label>Nama Produk <span class="text-danger">*</span></label>
                                 <input type="text" 
                                        name="name" 
                                        class="form-control @error('name') is-invalid @enderror" 
@@ -322,7 +369,7 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Harga (Rp)</label>
+                                <label>Harga (Rp) <span class="text-danger">*</span></label>
                                 <input type="number" 
                                        name="price" 
                                        class="form-control @error('price') is-invalid @enderror" 
@@ -339,7 +386,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label>Deskripsi</label>
+                        <label>Deskripsi <span class="text-danger">*</span></label>
                         <textarea name="description" 
                                   class="form-control @error('description') is-invalid @enderror" 
                                   rows="3" 
@@ -353,7 +400,7 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Stok Awal</label>
+                                <label>Stok Awal <span class="text-danger">*</span></label>
                                 <input type="number" 
                                        name="stock" 
                                        class="form-control @error('stock') is-invalid @enderror" 
@@ -368,23 +415,29 @@
 
                         <div class="col-md-6">
                             <div class="form-group">
-                                <label>Foto Produk</label>
+                                <label>Foto Produk <span class="text-danger">*</span></label>
                                 <input type="file" 
                                        name="image" 
                                        class="form-control-file @error('image') is-invalid @enderror" 
-                                       accept="image/*"
-                                       required>
-                                <small class="form-text text-muted">Format: JPG, PNG, JPEG (Max: 2MB)</small>
+                                       accept="image/jpeg,image/png,image/jpg,image/gif"
+                                       required
+                                       id="imageInput">
+                                <small class="form-text text-muted">Format: JPG, PNG, JPEG, GIF (Max: 2MB)</small>
                                 @error('image')
                                     <div class="invalid-feedback d-block">{{ $message }}</div>
                                 @enderror
+                            </div>
+                            <div id="imagePreview" class="mt-2" style="display: none;">
+                                <img id="previewImg" src="" style="max-width: 200px; border-radius: 8px; border: 2px solid #ddd;">
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">
+                        <i class="mdi mdi-close"></i> Batal
+                    </button>
+                    <button type="submit" class="btn btn-success">
                         <i class="mdi mdi-plus"></i> Tambah Produk
                     </button>
                 </div>
@@ -414,7 +467,7 @@
                         <tbody>
                             @forelse($shopSales as $order)
                             <tr>
-                                <td>{{ $order->user->name }}</td>
+                                <td>{{ $order->user->name ?? 'Unknown' }}</td>
                                 <td class="font-weight-bold">{{ $order->order_number }}</td>
                                 <td>{{ $order->items->count() }} item</td>
                                 <td class="text-success font-weight-bold">Rp{{ number_format($order->total_price, 0, ',', '.') }}</td>
@@ -459,5 +512,45 @@
     color: #adb5bd;
     font-size: 24px;
 }
+
+.modal-header.bg-primary,
+.modal-header.bg-success {
+    border-radius: 0;
+}
 </style>
+
+<script>
+// Image preview for add product
+document.getElementById('imageInput')?.addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            document.getElementById('previewImg').src = e.target.result;
+            document.getElementById('imagePreview').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+});
+
+// Auto close alerts after 5 seconds
+setTimeout(function() {
+    $('.alert').fadeOut('slow');
+}, 5000);
+
+// Re-open modal if validation errors exist
+@if($errors->any())
+    @if(old('_method') === 'PUT')
+        // This is an edit form submission
+        @foreach($products as $product)
+            @if(old('name') == $product->name || old('price') == $product->price)
+                $('#editModal{{ $product->id }}').modal('show');
+            @endif
+        @endforeach
+    @else
+        // This is an add form submission
+        $('#addProductModal').modal('show');
+    @endif
+@endif
+</script>
 @endsection

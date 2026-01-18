@@ -2,18 +2,58 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Order extends Model
 {
-    protected $guarded = ['id'];
+    use HasFactory;
 
+    protected $fillable = [
+        'user_id',
+        'order_number',
+        'total_price',
+        'status',
+        'payment_method',
+        'payment_proof',
+        'notes',
+    ];
+
+    protected $casts = [
+        'total_price' => 'decimal:2',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
+    ];
+
+    /**
+     * Get the user that owns the order.
+     */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the items for the order.
+     */
     public function items()
     {
         return $this->hasMany(OrderItem::class);
     }
-    public function user()
+
+    /**
+     * Scope for paid orders
+     */
+    public function scopePaid($query)
     {
-        return $this->belongsTo(User::class);
+        return $query->where('status', 'paid');
+    }
+
+    /**
+     * Scope for pending orders
+     */
+    public function scopePending($query)
+    {
+        return $query->where('status', 'pending');
     }
 }

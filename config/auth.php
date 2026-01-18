@@ -14,7 +14,7 @@ return [
 
         'admin' => [
             'driver' => 'session',
-            'provider' => 'users', // Gunakan provider yang sama jika admin & user dalam 1 tabel
+            'provider' => 'users', // ← FIX: Pakai provider yang sama
         ],
     ],
 
@@ -23,6 +23,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
+        // HAPUS provider 'admins'
     ],
 
     'passwords' => [
@@ -33,4 +34,6 @@ return [
             'throttle' => 60,
         ],
     ],
+
+    'password_timeout' => 10800,
 ];

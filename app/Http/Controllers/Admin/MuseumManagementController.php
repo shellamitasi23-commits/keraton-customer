@@ -17,39 +17,86 @@ class MuseumManagementController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nama' => 'required',
-            'deskripsi' => 'required',
-            'foto' => 'image|mimes:jpeg,png,jpg|max:2048'
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ], [
+            'nama.required' => 'Nama museum wajib diisi',
+            'deskripsi.required' => 'Deskripsi wajib diisi',
+            'foto.image' => 'File harus berupa gambar',
+            'foto.max' => 'Ukuran foto maksimal 2MB'
         ]);
 
-        $data = $request->all();
-        if ($request->hasFile('foto')) {
-            $data['foto'] = $request->file('foto')->store('museum', 'public');
-        }
+        try {
+            $data = [
+                'nama' => $validated['nama'],
+                'deskripsi' => $validated['deskripsi'],
+            ];
 
-        Museum::create($data);
-        return back()->with('success', 'Museum berhasil ditambahkan!');
+            if ($request->hasFile('foto')) {
+                $data['foto'] = $request->file('foto')->store('museum', 'public');
+            }
+
+            Museum::create($data);
+
+            return back()->with('success', 'Museum berhasil ditambahkan!');
+
+        } catch (\Exception $e) {
+            \Log::error('Museum creation error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menambahkan museum: ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, Museum $museum)
     {
-        $data = $request->all();
-        if ($request->hasFile('foto')) {
-            if ($museum->foto)
-                Storage::disk('public')->delete($museum->foto);
-            $data['foto'] = $request->file('foto')->store('museum', 'public');
+        $validated = $request->validate([
+            'nama' => 'required|string|max:255',
+            'deskripsi' => 'required|string',
+            'foto' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+        ]);
+
+        try {
+            $data = [
+                'nama' => $validated['nama'],
+                'deskripsi' => $validated['deskripsi'],
+            ];
+
+            if ($request->hasFile('foto')) {
+                // Hapus foto lama
+                if ($museum->foto && Storage::disk('public')->exists($museum->foto)) {
+                    Storage::disk('public')->delete($museum->foto);
+                }
+                $data['foto'] = $request->file('foto')->store('museum', 'public');
+            }
+
+            $museum->update($data);
+
+            return back()->with('success', 'Data Museum berhasil diperbarui!');
+
+        } catch (\Exception $e) {
+            \Log::error('Museum update error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal memperbarui museum: ' . $e->getMessage());
         }
-
-        $museum->update($data);
-        return back()->with('success', 'Data Museum diperbarui!');
     }
-
+    public function show(Museum $museum)
+    {
+        return view('admin.museum.show', compact('museum'));
+    }
     public function destroy(Museum $museum)
     {
-        if ($museum->foto)
-            Storage::disk('public')->delete($museum->foto);
-        $museum->delete();
-        return back()->with('success', 'Museum dihapus!');
+        try {
+            if ($museum->foto && Storage::disk('public')->exists($museum->foto)) {
+                Storage::disk('public')->delete($museum->foto);
+            }
+
+            $museum->delete();
+
+            return back()->with('success', 'Museum berhasil dihapus!');
+
+        } catch (\Exception $e) {
+            \Log::error('Museum delete error: ' . $e->getMessage());
+            return back()->with('error', 'Gagal menghapus museum: ' . $e->getMessage());
+        }
     }
 }
