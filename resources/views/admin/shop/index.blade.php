@@ -7,7 +7,6 @@
     <h3 class="page-title">Kelola Merchandise Keraton</h3>
 </div>
 
-{{-- Alert Messages --}}
 @if(session('success'))
 <div class="alert alert-success alert-dismissible fade show" role="alert">
     <i class="mdi mdi-check-circle mr-2"></i>{{ session('success') }}
@@ -40,7 +39,6 @@
 </div>
 @endif
 
-{{-- Statistics Cards --}}
 <div class="row">
     <div class="col-xl-3 col-sm-6 grid-margin stretch-card">
         <div class="card">
@@ -123,7 +121,6 @@
     </div>
 </div>
 
-{{-- Products Table --}}
 <div class="row">
     <div class="col-lg-12 grid-margin stretch-card">
         <div class="card">
@@ -139,7 +136,7 @@
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table">
                         <thead>
                             <tr>
                                 <th style="width: 80px;">Foto</th>
@@ -152,7 +149,7 @@
                         </thead>
                         <tbody>
                             @forelse($products as $product)
-                            <tr class="{{ $product->stock < 10 ? 'table-warning' : '' }}">
+                            <tr>
                                 <td>
                                     @if($product->image)
                                         <img src="{{ asset('storage/' . $product->image) }}" 
@@ -202,7 +199,6 @@
                                 </td>
                             </tr>
 
-                            {{-- Edit Modal --}}
                             <div class="modal fade" id="editModal{{ $product->id }}" tabindex="-1">
                                 <div class="modal-dialog modal-lg">
                                     <div class="modal-content">
@@ -336,7 +332,6 @@
     </div>
 </div>
 
-{{-- Add Product Modal --}}
 <div class="modal fade" id="addProductModal" tabindex="-1">
     <div class="modal-dialog modal-lg">
         <div class="modal-content">
@@ -446,14 +441,13 @@
     </div>
 </div>
 
-{{-- Transaction History --}}
 <div class="row">
     <div class="col-12 grid-margin">
         <div class="card">
             <div class="card-body">
                 <h4 class="card-title mb-4">Riwayat Transaksi Shop</h4>
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table ">
                         <thead>
                             <tr>
                                 <th>Customer</th>

@@ -10,6 +10,7 @@ class TicketCategory extends Model
         'name',
         'description',
         'price',
+        'image'
     ];
 
     public function transactions()

@@ -45,32 +45,42 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/tiket/payment/{id}', [TicketController::class, 'payment'])->name('tiket.payment');
     Route::post('/tiket/payment/{id}', [TicketController::class, 'processPayment'])->name('tiket.process');
 
-    Route::post('/shop/add/{id}', [ShopController::class, 'addToCart'])->name('shop.add');
-    Route::get('/cart', [ShopController::class, 'cart'])->name('shop.cart');
-    Route::patch('/cart/{id}/update', [ShopController::class, 'updateCart'])->name('cart.update');
-    Route::delete('/cart/{id}', [ShopController::class, 'deleteCart'])->name('shop.delete');
+    // ============================================
+    // SHOP & PRODUCT - ORDER ONLY FOR LOGGED IN USERS
+    // ============================================
 
+    // ============================================
+    // CART (KERANJANG)
+    // ============================================
+    Route::get('/cart', [ShopController::class, 'cart'])->name('shop.cart');
+    Route::post('/cart/add/{id}', [ShopController::class, 'addToCart'])->name('shop.cart.add');
+    Route::put('/cart/update/{id}', [ShopController::class, 'updateCart'])->name('shop.cart.update');
+    Route::delete('/cart/delete/{id}', [ShopController::class, 'deleteCart'])->name('shop.cart.delete');
+
+
+    // Route untuk MENAMPILKAN halaman checkout (GET)
     Route::get('/checkout', [ShopController::class, 'checkout'])->name('shop.checkout');
+
+    // Route untuk MEMPROSES checkout (POST) - INI YANG KURANG!
     Route::post('/checkout', [ShopController::class, 'processCheckout'])->name('shop.processCheckout');
 
-    Route::get('/shop/payment/{id}', [ShopController::class, 'payment'])->name('shop.payment');
-    Route::post('/shop/payment/{id}', [ShopController::class, 'processPayment'])->name('shop.pay');
+
+    // Route untuk MENAMPILKAN halaman payment (GET)
+    Route::get('/payment/{id}', [ShopController::class, 'payment'])->name('shop.payment');
+
+    // Route untuk MEMPROSES payment (POST)
+    Route::post('/payment/{id}', [ShopController::class, 'processPayment'])->name('shop.payment.process');
+
+    // Profile
 
     Route::get('/profile', [ProfileController::class, 'index'])->name('profile.index');
     Route::post('/profile/update', [ProfileController::class, 'update'])->name('profile.update');
 });
 
-/*
-|--------------------------------------------------------------------------
-| 3. ADMIN ROUTES - FIX: Hapus nested prefix admin
-|--------------------------------------------------------------------------
-*/
+//admin//
 Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function () {
-
-    // Dashboard
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-
-    // ✅ FIX: Museum Management - Hapus prefix('admin') yang dobel
+    // Kelola Museum
     Route::prefix('museum')->name('museum.')->group(function () {
         Route::get('/', [MuseumManagementController::class, 'index'])->name('index');
         Route::post('/', [MuseumManagementController::class, 'store'])->name('store');
@@ -85,7 +95,6 @@ Route::middleware(['admin'])->prefix('admin')->name('admin.')->group(function ()
     Route::delete('/tickets/{id}', [TicketManagementController::class, 'destroy'])->name('tickets.destroy');
 
     // Kelola Shop
-// Shop Management Routes
     Route::prefix('shop')->name('shop.')->group(function () {
         Route::get('/', [ShopManagementController::class, 'index'])->name('index');
         Route::post('/', [ShopManagementController::class, 'store'])->name('store');

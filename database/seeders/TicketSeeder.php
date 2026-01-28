@@ -13,35 +13,35 @@ class TicketSeeder extends Seeder
             'name' => 'Tiket Pelajar/Mahasiswa',
             'price' => 10000,
             'description' => 'Untuk pelajar dan mahasiswa dengan kartu identitas',
-            'image' => 'ilustrasi-siswa-sma_169.jpeg'
+            'image' => 'tickets/ilustrasi-siswa-sma_169.jpeg'
         ]);
 
         TicketCategory::create([
             'name' => 'Tiket Umum',
             'price' => 20000,
             'description' => 'Untuk pengunjung umum',
-            'image' => 'kasepuhan-1.jpg'
+            'image' => 'tickets/kasepuhan-1.jpg'
         ]);
 
         TicketCategory::create([
             'name' => 'Tiket Warga Negara Asing (WNA)',
             'price' => 20000,
             'description' => 'Wisatawan mancanegara',
-            'image' => 'arsitektur.jpg'
+            'image' => 'tickets/arsitektur.jpg'
         ]);
 
         TicketCategory::create([
             'name' => 'Tiket Paket Keluarga',
             'price' => 100000,
             'description' => 'Paket untuk keluarga',
-            'image' => 'bangunan-joglo.jpg'
+            'image' => 'tickets/bangunan-joglo.jpg'
         ]);
 
         TicketCategory::create([
             'name' => 'Tiket Paket All In',
             'price' => 30000,
             'description' => 'Paket lengkap dengan fasilitas tambahan',
-            'image' => 'dalem-agung.jpg'
+            'image' => 'tickets/dalem-agung.jpg'
         ]);
     }
 }

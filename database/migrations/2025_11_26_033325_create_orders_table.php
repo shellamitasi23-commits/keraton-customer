@@ -11,6 +11,11 @@ return new class extends Migration {
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('order_number')->unique();
+            $table->text('address');
+            $table->string('postal_code');
+            $table->string('whatsapp');
+            $table->decimal('subtotal', 12, 2);
+            $table->decimal('shipping_price', 12, 2)->default(0);
             $table->decimal('total_price', 12, 2);
             $table->enum('status', ['pending', 'paid', 'cancelled'])->default('pending');
             $table->string('payment_method')->nullable();

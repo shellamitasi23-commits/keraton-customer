@@ -32,14 +32,15 @@ class ProfileController extends Controller
     }
     public function update(Request $request)
     {
-        $request->validate([
-            'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048', // Max 2MB
-        ]);
-
         $user = Auth::user();
 
+        // Cek apakah ada file avatar atau data profile lainnya
         if ($request->hasFile('avatar')) {
-            // 1. Hapus foto lama jika ada (biar server gak penuh)
+            $request->validate([
+                'avatar' => 'required|image|mimes:jpeg,png,jpg,gif|max:2048',
+            ]);
+
+            // 1. Hapus foto lama jika ada
             if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
                 Storage::disk('public')->delete($user->avatar);
             }
@@ -49,8 +50,34 @@ class ProfileController extends Controller
 
             // 3. Update database
             $user->update(['avatar' => $path]);
+
+            return redirect()->route('profile.index')->with('success', 'Foto profil berhasil diupdate!');
         }
 
-        return back()->with('success', 'Foto profil berhasil diperbarui!');
+        // Update data profil (nama, email, phone)
+        if ($request->has('name') || $request->has('email') || $request->has('phone')) {
+            $request->validate([
+                'name' => 'required|string|max:255',
+                'email' => 'required|email|unique:users,email,' . $user->id,
+                'phone' => 'required|string|max:20',
+            ]);
+
+            $user->update([
+                'name' => $request->input('name'),
+                'email' => $request->input('email'),
+                'phone' => $request->input('phone'),
+            ]);
+
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Profil berhasil diupdate!'
+                ]);
+            }
+
+            return redirect()->route('profile.index')->with('success', 'Profil berhasil diupdate!');
+        }
+
+        return back();
     }
 }

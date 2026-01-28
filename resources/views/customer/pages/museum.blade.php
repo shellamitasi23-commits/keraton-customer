@@ -77,37 +77,35 @@
             </div>
         </div>
     </div>
-
-    <div class="py-24 bg-[#F5F5F5]">
-        <div class="max-w-7xl mx-auto px-6" >
-            <div class="text-center mb-16">
-                <h2 class="serif text-4xl font-bold text-[#103120] mb-3">Koleksi Museum</h2>
-                <div class="h-1 w-20 bg-[#E89020] mx-auto mt-6"></div>
-            </div>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                @forelse($museums as $item)
-                <div class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition duration-500 border border-gray-100 flex flex-col">
-                    <div class="h-72 bg-gray-200 overflow-hidden relative">
-                        
-                        <img src="{{ asset('storage/' . $item->foto) }}" 
-                             class="w-full h-full object-cover group-hover:scale-110 transition duration-700"
-                             alt="{{ $item->nama }}"
-                             onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
-                             
-                        <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300"></div>
-                    </div>
-                    <div class="p-8 flex-1">
-                        <h3 class="serif font-bold text-xl text-[#103120] mb-3">{{ $item->nama }}</h3>
-                        <p class="text-gray-600 leading-relaxed line-clamp-3">{{ $item->deskripsi }}</p>
-                    </div>
+<div class="py-24 bg-[#F5F5F5]">
+    <div class="max-w-7xl mx-auto px-6">
+        <div class="text-center mb-16">
+            <h2 class="serif text-4xl font-bold text-[#103120] mb-3">Koleksi Museum</h2>
+            <div class="h-1 w-20 bg-[#E89020] mx-auto mt-6"></div>
+        </div>
+        <br><br>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            @forelse($museums as $item)
+            <div class="group bg-white rounded-lg overflow-hidden shadow-sm hover:shadow-xl transition duration-500 border border-gray-100 flex flex-col">
+                <div class="h-[300px] bg-gray-200 overflow-hidden relative">
+                    <img src="{{ asset('storage/' . $item->foto) }}" 
+                         class="w-full h-full object-cover group-hover:scale-110 transition duration-700"
+                         alt="{{ $item->nama }}"
+                         onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'">
+                         
+                    <div class="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition duration-300"></div>
                 </div>
-                @empty
-                <div class="col-span-3 text-center py-12">
-                    <p class="text-gray-500 text-lg">Tidak ada koleksi museum yang tersedia.</p>
-                </div>
-                @endforelse
+                <div class="p-8 flex-1 flex flex-col">
+    <h3 class="serif font-bold text-xl text-[#103120] mb-3">{{ $item->nama }}</h3>
+    <p class="text-gray-600 leading-relaxed line-clamp-3 flex-1 text-justify">{{ $item->deskripsi }}</p>
+</div>
             </div>
+            @empty
+            <div class="col-span-3 text-center py-12">
+                <p class="text-gray-500 text-lg">Tidak ada koleksi museum yang tersedia.</p>
+            </div>
+            @endforelse
         </div>
     </div>
+</div>
 @endsection

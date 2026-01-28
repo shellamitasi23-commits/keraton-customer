@@ -24,96 +24,95 @@
 
  @guest
     {{-- Login Modal hanya untuk yang belum login --}}
-    <dialog id="loginModal" class="p-0 rounded-lg shadow-2xl backdrop:bg-black/60 w-[400px]">
-        <div class="bg-white p-8">
-            <h3 class="text-2xl font-bold text-center mb-6">LOGIN</h3>
+    <dialog id="loginModal" class="p-0 rounded-xl shadow-2xl backdrop:bg-black/60 w-[400px] max-w-[90vw]">
+        <div class="bg-white p-8 w-full rounded-xl relative">
+            <button type="button" onclick="document.getElementById('loginModal').close()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition cursor-pointer text-xl leading-none p-2">✕</button>
+            
+            <h3 class="text-2xl font-bold text-center mb-2 text-[#103120] pr-8">LOGIN</h3>
+            <p class="text-center text-sm text-gray-600 mb-6">Masuk ke akun Anda</p>
             
             @if($errors->any())
-                <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+                <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-4 rounded-lg mb-4 text-sm">
                     {{ $errors->first() }}
                 </div>
             @endif
 
-            <form method="POST" action="{{ route('login') }}">
+            <form method="POST" action="{{ route('login') }}" class="space-y-5">
                 @csrf
                 
-                <div class="mb-4">
-                    <label class="block text-sm font-semibold mb-2">Email</label>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Email</label>
                     <input type="email" 
                            name="email" 
-                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#103120]"
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base"
                            placeholder="Email Anda"
                            required>
                 </div>
-
-                <div class="mb-6">
-                    <label class="block text-sm font-semibold mb-2">Password</label>
+<br>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Password</label>
                     <input type="password" 
                            name="password" 
-                           class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-[#103120]"
+                           class="w-full px-3 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base"
                            placeholder="Password Anda"
                            required>
                 </div>
+                <br>
 
                 <button type="submit" 
-                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-medium hover:bg-[#1a4a30] transition cursor-pointer shadow-md hover:shadow-lg active:scale-95 text-base">
                     Login
                 </button>
             </form>
 
-            <p class="text-center mt-4 text-sm text-gray-600">
+            <p class="text-center mt-6 text-sm text-gray-600">
                 Belum punya akun? 
-                <a href="{{ route('register.form') }}" class="font-semibold text-[#103120] hover:underline">
-                    Daftar Sekarang
-                </a>
-            </p>
-
-            <form method="dialog" class="mt-4">
-                <button class="w-full bg-gray-200 py-2 rounded-lg font-semibold hover:bg-gray-300 transition">
-                    Tutup
+                <button type="button" onclick="document.getElementById('loginModal').close(); document.getElementById('registerModal').showModal()" class="text-[#103120] hover:text-[#1a4a30] transition cursor-pointer underline">
+                    Daftar
                 </button>
-            </form>
+            </p>
         </div>
     </dialog>
 @endguest
 
-    <dialog id="registerModal" class="bg-transparent p-0 rounded-xl shadow-2xl">
-        <div class="bg-white p-8 w-[400px] relative rounded-xl border border-gray-100">
-            <button onclick="document.getElementById('registerModal').close()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition">✕</button>
+    <dialog id="registerModal" class="p-0 rounded-xl shadow-2xl backdrop:bg-black/60 w-[400px] max-w-[90vw]">
+        <div class="bg-white p-8 w-full relative rounded-xl">
+            <button type="button" onclick="document.getElementById('registerModal').close()" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition cursor-pointer text-xl leading-none p-2">✕</button>
             
-            <h3 class="serif text-3xl font-bold text-center mb-6 text-[#103120]">Register</h3>
+            <h3 class="text-2xl font-bold text-center mb-2 text-[#103120] pr-8">REGISTER</h3>
+            <p class="text-center text-sm text-gray-600 mb-6">Buat akun baru Anda</p>
             
-            <form method="POST" action="{{ route('register') }}">
+            <form method="POST" action="{{ route('register') }}" class="space-y-4 max-h-[70vh] overflow-y-auto pr-2">
                 @csrf
-                <div class="mb-3">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Nama Lengkap</label>
-                    <input type="text" name="name" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Nama Anda" required>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Nama Lengkap</label>
+                    <input type="text" name="name" class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base" placeholder="Nama Anda" required>
                 </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Email</label>
-                    <input type="email" name="email" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Email Anda" required>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Email</label>
+                    <input type="email" name="email" class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base" placeholder="Email Anda" required>
                 </div>
-                <div class="mb-3">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Nomor Telephone</label>
-                    <input type="text" name="phone" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Nomor Anda" required>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Nomor Telepon</label>
+                    <input type="text" name="phone" class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base" placeholder="Nomor Anda" required>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Password</label>
-                    <input type="password" name="password" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Password Anda" required>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Password</label>
+                    <input type="password" name="password" class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base" placeholder="Password Anda" required>
                 </div>
-                <div class="mb-6">
-                    <label class="block text-sm font-bold mb-1 text-gray-700">Konfirmasi Password</label>
-                    <input type="password" name="password_confirmation" class="w-full border border-gray-300 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] bg-gray-50 focus:bg-white" placeholder="Konfirmasi Password Anda" required>
+                <div>
+                    <label class="block text-sm mb-2 text-gray-700">Konfirmasi Password</label>
+                    <input type="password" name="password_confirmation" class="w-full border border-gray-300 px-4 py-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#103120] focus:border-transparent transition text-base placeholder:text-base" placeholder="Konfirmasi Password Anda" required>
                 </div>
- <button type="submit" 
-                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-semibold hover:bg-[#1a4a30] transition">
+                <button type="submit" 
+                        class="w-full bg-[#103120] text-white py-3 rounded-lg font-medium hover:bg-[#1a4a30] transition cursor-pointer shadow-md hover:shadow-lg active:scale-95 mt-4 text-base">
                     Register
                 </button>
             </form>
 
             <div class="mt-6 text-center text-sm">
-                <span class="text-gray-500">Sudah punya akun?</span>
-                <button onclick="document.getElementById('registerModal').close(); document.getElementById('loginModal').showModal()" class="text-[#103120] font-bold underline ml-1">Login</button>
+                <span class="text-gray-600">Sudah punya akun?</span>
+                <button type="button" onclick="document.getElementById('registerModal').close(); document.getElementById('loginModal').showModal()" class="text-[#103120] hover:text-[#1a4a30] transition cursor-pointer ml-1 underline">Login</button>
             </div>
         </div>
     </dialog>

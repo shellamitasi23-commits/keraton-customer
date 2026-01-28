@@ -234,11 +234,6 @@
                     @enderror
                 </div>
 
-                <div class="remember-me">
-                    <input type="checkbox" name="remember" id="remember">
-                    <label for="remember">Ingat saya</label>
-                </div>
-
                 <button type="submit" class="btn-login">
                     Masuk
                 </button>

@@ -13,8 +13,18 @@ class TicketTransaction extends Model
         'visit_date',
         'total_ticket',
         'total_price',
-        'payment_proof',
+        'ticket_details', 
         'status',
+        'payment_method',
+        'payment_proof',
+        'paid_at', 
+    ];
+
+    protected $casts = [
+        'visit_date' => 'date',
+        'ticket_details' => 'array', 
+        'paid_at' => 'datetime',
+        'total_price' => 'decimal:2',
     ];
 
     // Relasi ke User

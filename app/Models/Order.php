@@ -12,48 +12,32 @@ class Order extends Model
     protected $fillable = [
         'user_id',
         'order_number',
+        'address',
+        'postal_code',
+        'whatsapp',
+        'subtotal',
+        'shipping_price',
         'total_price',
         'status',
         'payment_method',
         'payment_proof',
-        'notes',
     ];
 
     protected $casts = [
+        'subtotal' => 'decimal:2',
+        'shipping_price' => 'decimal:2',
         'total_price' => 'decimal:2',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
-    /**
-     * Get the user that owns the order.
-     */
     public function user()
     {
         return $this->belongsTo(User::class);
     }
 
-    /**
-     * Get the items for the order.
-     */
     public function items()
     {
         return $this->hasMany(OrderItem::class);
-    }
-
-    /**
-     * Scope for paid orders
-     */
-    public function scopePaid($query)
-    {
-        return $query->where('status', 'paid');
-    }
-
-    /**
-     * Scope for pending orders
-     */
-    public function scopePending($query)
-    {
-        return $query->where('status', 'pending');
     }
 }

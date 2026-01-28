@@ -4,7 +4,6 @@
 <div class="bg-gray-50 min-h-screen py-12">
     <div class="max-w-5xl mx-auto px-6">
         
-        {{-- HEADER PROFIL --}}
         <div class="p-8 rounded-lg shadow-lg flex flex-col md:flex-row items-center gap-6 mb-8" 
              style="background-color: #C8F05A; color: #103120;">
             
@@ -41,7 +40,6 @@
 
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-8 overflow-hidden">
             <div class="flex border-b overflow-x-auto">
-                {{-- TAB NAVIGATION --}}
                 <button onclick="switchTab('profile')" id="btn-profile" 
                         class="flex-1 py-4 font-bold text-[#103120] border-b-4 hover:bg-gray-50 transition min-w-[120px] flex items-center justify-center gap-2"
                         style="border-bottom-color: #C8F05A;">
@@ -88,7 +86,6 @@
                         </div>
                     </div>
 
-                    {{-- RINGKASAN AKTIVITAS --}}
                     <div class="bg-[#103120] rounded-lg p-6 text-white shadow-lg relative overflow-hidden" 
                          style="border-left: 8px solid #C8F05A;">
                         

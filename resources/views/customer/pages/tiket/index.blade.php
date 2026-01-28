@@ -20,12 +20,11 @@
             <div class="bg-white p-6 rounded-lg shadow-sm flex flex-col md:flex-row gap-6 items-center border border-gray-100 hover:shadow-md transition">
                 
                 <div class="w-full md:w-48 h-32 bg-gray-200 rounded-md overflow-hidden relative group shrink-0">
-                    <img src="{{ asset('images/' . $ticket->image) }}" 
+                    <img src="{{ asset('storage/' . $ticket->image) }}" 
                          class="w-full h-full object-cover transition duration-500 group-hover:scale-110" 
                          alt="{{ $ticket->name }}"
-                         onerror="this.src='https:via.placeholder.com/400x300?text=No+Image'"> 
+                         onerror="this.src='https://via.placeholder.com/400x300?text=No+Image'"> 
                 </div>
-                
                 <div class="flex-1 w-full">
                     <h3 class="font-bold text-xl text-[#103120]">{{ $ticket->name }}</h3>
                     <p class="text-xs text-red-500 mb-2">*{{ $ticket->description }}</p>
@@ -37,7 +36,7 @@
                         </div>
                         
                         <div class="flex items-center gap-3">
-                            <button type="button" onclick="updateQty({{ $ticket->id }}, -1)" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition">-</button>
+                            <button type="button" onclick="updateQty({{ $ticket->id }}, -1)" class="w-8 h-8 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition cursor-pointer">-</button>
                             
                             <input type="number" 
                                    id="qty-{{ $ticket->id }}" 
@@ -48,7 +47,7 @@
                                    data-price="{{ $ticket->price }}"
                                    data-name="{{ $ticket->name }}">
                                    
-                            <button type="button" onclick="updateQty({{ $ticket->id }}, 1)" class="w-8 h-8 rounded-full bg-[#103120] text-white flex items-center justify-center hover:bg-green-900 transition">+</button>
+                            <button type="button" onclick="updateQty({{ $ticket->id }}, 1)" class="w-8 h-8 rounded-full bg-[#103120] text-white flex items-center justify-center hover:bg-green-900 transition cursor-pointer">+</button>
                         </div>
                     </div>
                 </div>
@@ -61,9 +60,9 @@
             
             <div class="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
                 <h3 class="font-bold mb-4 text-[#103120]">Tanggal Kunjungan</h3>
-                <input type="date" name="visit_date" class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-[#103120] focus:ring-1 focus:ring-[#103120]" required>
+                <input type="date" name="visit_date" class="w-full p-3 rounded border border-gray-300 focus:outline-none focus:border-[#103120] focus:ring-1 focus:ring-[#103120] cursor-pointer" required>
             </div>
-
+            
             <div class="bg-[#1F3B2B] text-white p-6 rounded-lg shadow-lg sticky top-24">
                 <div class="flex items-center gap-2 mb-6">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-yellow-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -82,11 +81,11 @@
                 </div>
 
                 @auth
-                    <button type="submit" class="w-full bg-[#E89020] text-white font-bold py-3.5 rounded hover:bg-orange-600 transition shadow-lg transform hover:-translate-y-0.5">
+                    <button type="submit" class="w-full h-12 bg-[#E89020] text-white font-bold py-4 rounded hover:bg-orange-400  transition cursor-pointer">
                         Lanjut Pembayaran
                     </button>
                 @else
-                    <button type="button" onclick="document.getElementById('loginModal').showModal()" class="w-full bg-gray-500 text-white font-bold py-3.5 rounded hover:bg-gray-600 transition cursor-not-allowed">
+                    <button type="button" onclick="document.getElementById('loginModal').showModal()" class="w-full h-12 bg-gray-500 text-white font-bold py-4 rounded hover:bg-gray-600 transition cursor-not-allowed">
                         Login untuk Memesan
                     </button>
                 @endauth

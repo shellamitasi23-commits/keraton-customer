@@ -21,7 +21,6 @@
 
         <div class="flex items-center gap-4">
            @auth
-                {{-- Keranjang --}}
                 <a href="{{ route('shop.cart') }}" 
                    class="relative text-white hover:text-yellow-400 transition group" 
                    title="Lihat Keranjang">
@@ -41,11 +40,9 @@
                     @endif
                 </a>
 
-                {{-- User Profile dengan Avatar --}}
                 <a href="{{ route('profile.index') }}" 
                    class="flex items-center gap-2 hover:opacity-90 transition group bg-white/10 rounded-full pl-1 pr-3 py-1">
                     
-                    {{-- Avatar dengan Fallback --}}
                     <div class="relative">
                         @if(Auth::user()->avatar)
                             <img src="{{ asset('storage/' . Auth::user()->avatar) }}" 
@@ -58,14 +55,10 @@
                                 </span>
                             </div>
                         @endif
-                        
-                        {{-- Online Indicator --}}
-                        <span class="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-400 border-2 border-[#103120] rounded-full"></span>
+                        <span class="text-yellow-400 text-lg ml-1">●</span>
                     </div>
                     
-                    {{-- Nama User --}}
-                    <div class="flex flex-col leading-tight">
-                        <span class="font-semibold text-sm text-white group-hover:text-yellow-400 transition">
+                    <span class="font-semibold text-sm text-white group-hover:text-yellow-400 transition">
                             {{ explode(' ', Auth::user()->name)[0] }}
                         </span>
                         <span class="text-[10px] text-gray-300 hidden lg:block">
@@ -76,9 +69,8 @@
 
                 {{-- Logout Button --}}
                 <form method="POST" action="{{ route('logout') }}" class="inline">
-                    @csrf
                     <button type="submit" 
-                            class="text-white hover:text-red-400 transition p-2 rounded-full hover:bg-white/10" 
+                            class="text-white hover:text-red-400 transition p-2 rounded-full hover:bg-white/10 cursor-pointer" 
                             title="Keluar">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -86,9 +78,8 @@
                     </button>
                 </form>
             @else
-                {{-- Guest Buttons --}}
                 <button onclick="document.getElementById('loginModal').showModal()" 
-                        class="bg-white text-[#103120] px-5 py-2 rounded-lg font-semibold text-sm hover:bg-yellow-400 hover:text-[#103120] transition shadow-md">
+                        class="bg-white text-[#103120] px-5 py-2 rounded-lg font-semibold text-sm hover:bg-gray-200 transition">
                     Login
                 </button>
                 <button onclick="document.getElementById('registerModal').showModal()" 
@@ -100,5 +91,4 @@
     </div>
 </nav>
 
-{{-- Spacer untuk Fixed Navbar --}}
 <div class="h-20"></div>
